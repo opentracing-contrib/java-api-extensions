@@ -19,4 +19,13 @@ package io.opentracing.contrib.observer;
  */
 public interface TracerObserver {
 
+    /**
+     * Notifies the observer that a new span is being built with the supplied operation
+     * name.
+     *
+     * @param operationName The operation name
+     * @return The observer for the {@link SpanBuilder}
+     */
+    SpanBuilderObserver onBuildSpan(String operationName);
+
 }
