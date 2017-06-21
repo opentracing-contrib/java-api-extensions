@@ -19,17 +19,17 @@ import java.util.Map;
 public class ExampleStatefulObserver implements TracerObserver {
 
     @Override
-    public SpanObserver onStart(SpanData spanData, long startMicros, String operationName) {
-        return new StatefulSpanObserver(spanData, startMicros, operationName);
+    public SpanObserver onStart(SpanData spanData) {
+        return new StatefulSpanObserver(spanData);
     }
 
     public static class SpanState {
         private final long startMicros;
         private String operationName;
 
-        public SpanState(SpanData spanData, long startMicros, String operationName) {
-            this.startMicros = startMicros;
-            this.operationName = operationName;
+        public SpanState(SpanData spanData) {
+            this.startMicros = spanData.getStartTime();
+            this.operationName = spanData.getOperationName();
         }
     }
 
@@ -37,8 +37,8 @@ public class ExampleStatefulObserver implements TracerObserver {
         
         private Map<Object,SpanState> spanState = new HashMap<Object,SpanState>();
 
-        public StatefulSpanObserver(SpanData spanData, long startMicros, String operationName) {
-            SpanState state = new SpanState(spanData, startMicros, operationName);
+        public StatefulSpanObserver(SpanData spanData) {
+            SpanState state = new SpanState(spanData);
             spanState.put(spanData.getSpanId(), state);
         }
 

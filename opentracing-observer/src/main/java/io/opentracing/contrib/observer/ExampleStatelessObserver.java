@@ -18,7 +18,7 @@ import java.util.Map;
 public class ExampleStatelessObserver implements TracerObserver, SpanObserver {
 
     @Override
-    public SpanObserver onStart(SpanData spanData, long startMicros, String operationName) {
+    public SpanObserver onStart(SpanData spanData) {
         return this;
     }
 
