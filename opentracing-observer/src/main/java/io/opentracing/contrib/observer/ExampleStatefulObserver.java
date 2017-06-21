@@ -23,22 +23,17 @@ public class ExampleStatefulObserver implements TracerObserver {
         return new StatefulSpanObserver(spanData);
     }
 
-    public static class SpanState {
-        private final long startMicros;
-        private String operationName;
-
-        public SpanState(SpanData spanData) {
-            this.startMicros = spanData.getStartTime();
-            this.operationName = spanData.getOperationName();
+    public static class MyObserverState {
+        public MyObserverState() {
         }
     }
 
     public static class StatefulSpanObserver implements SpanObserver {
         
-        private Map<Object,SpanState> spanState = new HashMap<Object,SpanState>();
+        private Map<Object,MyObserverState> spanState = new HashMap<Object,MyObserverState>();
 
         public StatefulSpanObserver(SpanData spanData) {
-            SpanState state = new SpanState(spanData);
+            MyObserverState state = new MyObserverState();
             spanState.put(spanData.getSpanId(), state);
         }
 
@@ -74,7 +69,7 @@ public class ExampleStatefulObserver implements TracerObserver {
 
         @Override
         public void onFinish(SpanData spanData, long finishMicros) {
-            SpanState state = spanState.remove(spanData.getSpanId());
+            MyObserverState state = spanState.remove(spanData.getSpanId());
         }
     }
 }
