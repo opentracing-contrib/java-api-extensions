@@ -13,6 +13,8 @@
  */
 package io.opentracing.contrib.observer;
 
+import io.opentracing.Span;
+
 /**
  * This interface represents an observer used to receive notifications related to {@link Span}s.
  *
@@ -20,12 +22,13 @@ package io.opentracing.contrib.observer;
 public interface TracerObserver {
 
     /**
-     * Notifies the observer that a new span is being built with the supplied operation
-     * name.
+     * Notifies the observer that a new span has been started with the supplied details.
      *
+     * @param spanData The data for the span being started
+     * @param startMicros The start time in microseconds
      * @param operationName The operation name
-     * @return The observer for the {@link SpanBuilder}
+     * @return The observer for the {@link Span}
      */
-    SpanBuilderObserver onBuildSpan(String operationName);
+    SpanObserver onStart(SpanData spanData, long startMicros, String operationName);
 
 }

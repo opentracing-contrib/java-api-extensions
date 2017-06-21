@@ -24,50 +24,56 @@ public interface SpanObserver {
     /**
      * Notifies the observer that the operation name has been changed.
      *
+     * @param spanData The data for the span
      * @param operationName The new operation name
      */
-    void onSetOperationName(String operationName);
+    void onSetOperationName(SpanData spanData, String operationName);
 
     /**
      * Notifies the observer that the named tag has been set/changed.
      *
-     * @param name The tag name
+     * @param spanData The data for the span
+     * @param key The tag key
      * @param value The tag value
      */
-    void onSetTag(String name, Object value);
+    void onSetTag(SpanData spanData, String key, Object value);
 
     /**
      * Notifies the observer that the named baggage item has been set/changed.
      *
+     * @param spanData The data for the span
      * @param key The baggage key
      * @param value The baggage value
      */
-    void onSetBaggageItem(String key, String value);
+    void onSetBaggageItem(SpanData spanData, String key, String value);
 
     /**
      * Notifies the observer that a log event has been recorded.
      *
+     * @param spanData The data for the span
      * @param timestampMicroseconds The explicit timestamp for the log record. Must be greater than or equal to the
      *                              Span's start timestamp.
      * @param fields key:value log fields. Tracer implementations should support String, numeric, and boolean values;
      *               some may also support arbitrary Objects.
      */
-    void onLog(long timestampMicroseconds, Map<String, ?> fields);
+    void onLog(SpanData spanData, long timestampMicroseconds, Map<String, ?> fields);
 
     /**
      * Notifies the observer that a log event has been recorded.
      *
+     * @param spanData The data for the span
      * @param timestampMicroseconds The explicit timestamp for the log record. Must be greater than or equal to the
      *                              Span's start timestamp.
      * @param event the event value; often a stable identifier for a moment in the Span lifecycle
      */
-    void onLog(long timestampMicroseconds, String event);
+    void onLog(SpanData spanData, long timestampMicroseconds, String event);
 
     /**
      * Notifies the observer that the associated {@link Span} has finished.
      *
+     * @param spanData The data for the span
      * @param finishMicros The finish time in microseconds
      */
-    void onFinish(long finishMicros);
+    void onFinish(SpanData spanData, long finishMicros);
 
 }
