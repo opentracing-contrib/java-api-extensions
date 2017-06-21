@@ -29,6 +29,13 @@ public interface SpanData {
      */
     Object getSpanId();
 
+    /**
+     * The start time of the {@link Span}.
+     *
+     * @return The start time, in microseconds
+     */
+    long getStartTime();
+
     String getOperationName();
 
     /* Spec does not indicate that a tag key could have multiple values - but some tracers support
