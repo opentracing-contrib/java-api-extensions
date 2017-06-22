@@ -16,7 +16,7 @@ package io.opentracing.contrib.observer;
 import java.util.Map;
 
 /**
- * This interface represents an observer used to receive notifications related to a {@link Span}.
+ * This interface represents an observer used to receive notifications related to a {@link io.opentracing.Span}.
  *
  */
 public interface SpanObserver {
@@ -30,7 +30,8 @@ public interface SpanObserver {
     void onSetOperationName(SpanData spanData, String operationName);
 
     /**
-     * Notifies the observer that the named tag has been set/changed.
+     * Notifies the observer that the tag with the supplied key has been set or updated
+     * on a {@link io.opentracing.Span}.
      *
      * @param spanData The data for the span
      * @param key The tag key
@@ -69,7 +70,7 @@ public interface SpanObserver {
     void onLog(SpanData spanData, long timestampMicroseconds, String event);
 
     /**
-     * Notifies the observer that the associated {@link Span} has finished.
+     * Notifies the observer that a span associated with the supplied data has finished.
      *
      * @param spanData The data for the span
      * @param finishMicros The finish time in microseconds

@@ -13,41 +13,53 @@
  */
 package io.opentracing.contrib.observer;
 
+import java.util.Map;
+
 /**
- * This interface provides information about the current {@link Span} to the observer
+ * This interface provides information about the current {@link io.opentracing.Span} to the observer
  * methods.
  *
  */
 public interface SpanData {
 
     /**
-     * This method returns an id that can be used for correlation purposes. It should only
-     * be used within the application to uniquely distinguish one span from another,
-     * to enable state to be maintained within observer implementation where appropriate.
+     * This method returns an id that can be used for correlate actions invoked on a
+     * stateful observer. It should only be used within the scope of an application,
+     * to uniquely distinguish one span from another, to enable state to be maintained
+     * within observer implementation where appropriate.
      *
-     * @return The unique id for the span
+     * @return The correlation id for the span, MUST implement equals/hashCode to enable
+     *              it to be used as a map key
      */
-    Object getSpanId();
+    Object getCorrelationId();
 
     /**
-     * The start time of the {@link Span}.
+     * The start time of the {@link io.opentracing.Span}.
      *
      * @return The start time, in microseconds
      */
     long getStartTime();
 
+    /**
+     * The operation name of the {@link io.opentracing.Span}.
+     *
+     * @return The operation name
+     */
     String getOperationName();
 
-    /* Spec does not indicate that a tag key could have multiple values - but some tracers support
-     * this? Would be good to understand the usecase for multivalued keys - and add some text in the
-     * spec to clarify this?
-     * Possibly as well as returning the String,Boolean,Number values, it could return a List in those cases?
-     * 
-     * Q: Do we need a 'getTags' method - in which case would it return Map<String,List<?>> ?
-     * Other option may be to have a Set<String> getTagKeys() ?
+    /**
+     * This method provides access to the tags associated with the span.
+     *
+     * @return The tags
      */
-    Object getTag(String key);
+    Map<String,Object> getTags();
 
+    /**
+     * This method retrieves a baggage item associated with the supplied key.
+     *
+     * @param key The key
+     * @return The baggage item, or null if undefined
+     */
     Object getBaggageItem(String key);
 
 }
