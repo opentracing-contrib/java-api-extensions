@@ -36,9 +36,23 @@ public interface SpanData {
     /**
      * The start time of the {@link io.opentracing.Span}.
      *
-     * @return The start time, in microseconds
+     * @return The start time (in microseconds)
      */
     long getStartTime();
+
+    /**
+     * The finish time of the {@link io.opentracing.Span}.
+     *
+     * @return The finish time (in microseconds), or 0 if not available
+     */
+    long getFinishTime();
+
+    /**
+     * The duration of the {@link io.opentracing.Span}.
+     *
+     * @return The duration (in microseconds), or 0 if the span is not finished
+     */
+    long getDuration();
 
     /**
      * The operation name of the {@link io.opentracing.Span}.
