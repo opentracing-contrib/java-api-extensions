@@ -67,7 +67,7 @@ public interface SpanData {
      *
      * @return The tags
      */
-    Map<String,List<Object>> getTags();
+    Map<String, List<Object>> getTags();
 
     /**
      * This method retrieves a baggage item associated with the supplied key.
