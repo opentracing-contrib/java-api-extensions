@@ -13,6 +13,7 @@
  */
 package io.opentracing.contrib.observer;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -66,7 +67,7 @@ public interface SpanData {
      *
      * @return The tags
      */
-    Map<String,Object> getTags();
+    Map<String,List<Object>> getTags();
 
     /**
      * This method retrieves a baggage item associated with the supplied key.
