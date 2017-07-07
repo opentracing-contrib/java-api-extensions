@@ -13,7 +13,6 @@
  */
 package io.opentracing.contrib.observer;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -63,11 +62,13 @@ public interface SpanData {
     String getOperationName();
 
     /**
-     * This method provides access to the tags associated with the span.
+     * This method provides access to the tags associated with the span. If the
+     * tracer implementation supports multiple values for a key, then only the
+     * most recent value will be returned.
      *
      * @return The tags
      */
-    Map<String, List<Object>> getTags();
+    Map<String, Object> getTags();
 
     /**
      * This method retrieves a baggage item associated with the supplied key.
