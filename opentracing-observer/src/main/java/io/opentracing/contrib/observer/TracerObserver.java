@@ -40,7 +40,7 @@ public interface TracerObserver {
      * to a logging framework, or {@link SpanObserver#onFinish onFinish}
      * being used to record metrics about the duration of the span.
      * 
-     * @param spanData The data for the span being started
+     * @param spanData The data for the span that has been started
      * @return The observer for the {@link Span}
      */
     SpanObserver onStart(SpanData spanData);

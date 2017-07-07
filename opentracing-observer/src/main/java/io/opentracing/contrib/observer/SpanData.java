@@ -71,6 +71,33 @@ public interface SpanData {
     Map<String, Object> getTags();
 
     /**
+     * This method returns the tag value, associated with the supplied key,
+     * if it exists and has a {@link String} type.
+     *
+     * @param key The tag key
+     * @return The value, if exists and is a {@link String} type, otherwise null
+     */
+    String getStringTag(String key);
+
+    /**
+     * This method returns the tag value, associated with the supplied key,
+     * if it exists and has a {@link Number} type.
+     *
+     * @param key The tag key
+     * @return The value, if exists and is a {@link Number} type, otherwise null
+     */
+    Number getNumberTag(String key);
+
+    /**
+     * This method returns the tag value, associated with the supplied key,
+     * if it exists and has a {@link Boolean} type.
+     *
+     * @param key The tag key
+     * @return The value, if exists and is a {@link Boolean} type, otherwise null
+     */
+    Boolean getBooleanTag(String key);
+
+    /**
      * This method retrieves a baggage item associated with the supplied key.
      *
      * @param key The key

@@ -17,7 +17,9 @@ import java.util.Map;
 
 /**
  * This interface represents an observer used to receive notifications related to a {@link io.opentracing.Span}.
- *
+ * <p>
+ * Note: All of these callback functions are called after the associated operation has been performed on the
+ * {@link io.opentracing.Span}, i.e. they are post-change notifications.
  */
 public interface SpanObserver {
 
