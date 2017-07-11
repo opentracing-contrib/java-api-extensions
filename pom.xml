@@ -18,18 +18,18 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>io.opentracing.contrib</groupId>
-  <artifactId>opentracing-observer-parent</artifactId>
+  <artifactId>opentracing-api-extensions-parent</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>OpenTracing Observer</name>
-  <description>Observer API for OpenTracing instrumented services</description>
-  <url>http://github.com/opentracing-contrib/java-observer</url>
+  <name>OpenTracing API Extensions</name>
+  <description>API Extensions for OpenTracing</description>
+  <url>http://github.com/opentracing-contrib/java-api-extensions</url>
 
   <scm>
     <url>https://github.com/opentracing-contrib/java-observer</url>
-    <connection>scm:git:https://github.com/opentracing-contrib/java-observer.git</connection>
-    <developerConnection>scm:git:https://github.com/opentracing-contrib/java-observer.git</developerConnection>
+    <connection>scm:git:https://github.com/opentracing-contrib/java-api-extensions.git</connection>
+    <developerConnection>scm:git:https://github.com/opentracing-contrib/java-api-extensions.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
 
@@ -57,7 +57,7 @@
   </organization>
 
   <modules>
-    <module>opentracing-observer</module>
+    <module>opentracing-api-extensions</module>
   </modules>
 
   <properties>
@@ -90,7 +90,7 @@
   <distributionManagement>
     <repository>
       <id>bintray</id>
-      <url>https://api.bintray.com/maven/opentracing/maven/opentracing-observer/;publish=1</url>
+      <url>https://api.bintray.com/maven/opentracing/maven/opentracing-api-extensions/;publish=1</url>
     </repository>
     <snapshotRepository>
       <id>jfrog-snapshots</id>
@@ -133,7 +133,7 @@
         <configuration>
           <subject>opentracing</subject>
           <repo>maven</repo>
-          <packageName>opentracing-observer</packageName>
+          <packageName>opentracing-api-extensions</packageName>
         </configuration>
       </plugin>
       <plugin>
