@@ -45,130 +45,121 @@ public class APIExtensionsSpanBuilderTest {
 
     @Test
     public void testAsChildOfSpanContext() {
-        SpanBuilder spanBuilder = Mockito.mock(SpanBuilder.class);
-        APIExtensionsSpanBuilder extSpanBuilder = new APIExtensionsSpanBuilder(null, Collections.<TracerObserver>emptyList(),
-                null, spanBuilder);
-        
-        SpanContext spanContext = Mockito.mock(SpanContext.class);
+        TestResources res = new TestResources();
 
-        extSpanBuilder.asChildOf(spanContext);
-        Mockito.verify(spanBuilder).asChildOf(spanContext);
+        res.extSpanBuilder.asChildOf(res.spanContext);
+        Mockito.verify(res.spanBuilder).asChildOf(res.spanContext);
     }
 
     @Test
     public void testAsChildOfSpan() {
-        SpanBuilder spanBuilder = Mockito.mock(SpanBuilder.class);
-        APIExtensionsSpanBuilder extSpanBuilder = new APIExtensionsSpanBuilder(null, Collections.<TracerObserver>emptyList(),
-                null, spanBuilder);
-        
-        Span span = Mockito.mock(Span.class);
+        TestResources res = new TestResources();
 
-        extSpanBuilder.asChildOf(span);
-        Mockito.verify(spanBuilder).asChildOf(span);
+        res.extSpanBuilder.asChildOf(res.span);
+        Mockito.verify(res.spanBuilder).asChildOf(res.span);
     }
 
     @Test
     public void testAddReference() {
-        SpanBuilder spanBuilder = Mockito.mock(SpanBuilder.class);
-        APIExtensionsSpanBuilder extSpanBuilder = new APIExtensionsSpanBuilder(null, Collections.<TracerObserver>emptyList(),
-                null, spanBuilder);
-        
-        SpanContext spanContext = Mockito.mock(SpanContext.class);
+        TestResources res = new TestResources();
 
-        extSpanBuilder.addReference(References.FOLLOWS_FROM, spanContext);
-        Mockito.verify(spanBuilder).addReference(References.FOLLOWS_FROM, spanContext);
+        res.extSpanBuilder.addReference(References.FOLLOWS_FROM, res.spanContext);
+        Mockito.verify(res.spanBuilder).addReference(References.FOLLOWS_FROM, res.spanContext);
     }
 
     @Test
     public void testIgnoreActiveSpan() {
-        SpanBuilder spanBuilder = Mockito.mock(SpanBuilder.class);
-        APIExtensionsSpanBuilder extSpanBuilder = new APIExtensionsSpanBuilder(null, Collections.<TracerObserver>emptyList(),
-                null, spanBuilder);
+        TestResources res = new TestResources();
         
-        extSpanBuilder.ignoreActiveSpan();
-        Mockito.verify(spanBuilder).ignoreActiveSpan();
+        res.extSpanBuilder.ignoreActiveSpan();
+        Mockito.verify(res.spanBuilder).ignoreActiveSpan();
     }
 
     @Test
     public void testWithTagString() {
-        SpanBuilder spanBuilder = Mockito.mock(SpanBuilder.class);
-        APIExtensionsSpanBuilder extSpanBuilder = new APIExtensionsSpanBuilder(null, Collections.<TracerObserver>emptyList(),
-                null, spanBuilder);
-        
-        extSpanBuilder.withTag("tagName", "tagValue");
-        Mockito.verify(spanBuilder).withTag("tagName", "tagValue");
-        assertEquals("tagValue", extSpanBuilder.tags().get("tagName"));
+        TestResources res = new TestResources();
+
+        res.extSpanBuilder.withTag("tagName", "tagValue");
+        Mockito.verify(res.spanBuilder).withTag("tagName", "tagValue");
+        assertEquals("tagValue", res.extSpanBuilder.tags().get("tagName"));
     }
 
     @Test
     public void testWithTagNumber() {
-        SpanBuilder spanBuilder = Mockito.mock(SpanBuilder.class);
-        APIExtensionsSpanBuilder extSpanBuilder = new APIExtensionsSpanBuilder(null, Collections.<TracerObserver>emptyList(),
-                null, spanBuilder);
+        TestResources res = new TestResources();
         
-        extSpanBuilder.withTag("tagName", 5);
-        Mockito.verify(spanBuilder).withTag("tagName", 5);
-        assertEquals(5, extSpanBuilder.tags().get("tagName"));
+        res.extSpanBuilder.withTag("tagName", 5);
+        Mockito.verify(res.spanBuilder).withTag("tagName", 5);
+        assertEquals(5, res.extSpanBuilder.tags().get("tagName"));
     }
 
     @Test
     public void testWithTagBoolean() {
-        SpanBuilder spanBuilder = Mockito.mock(SpanBuilder.class);
-        APIExtensionsSpanBuilder extSpanBuilder = new APIExtensionsSpanBuilder(null, Collections.<TracerObserver>emptyList(),
-                null, spanBuilder);
+        TestResources res = new TestResources();
         
-        extSpanBuilder.withTag("tagName", Boolean.TRUE);
-        Mockito.verify(spanBuilder).withTag("tagName", Boolean.TRUE);
-        assertEquals(Boolean.TRUE, extSpanBuilder.tags().get("tagName"));
+        res.extSpanBuilder.withTag("tagName", Boolean.TRUE);
+        Mockito.verify(res.spanBuilder).withTag("tagName", Boolean.TRUE);
+        assertEquals(Boolean.TRUE, res.extSpanBuilder.tags().get("tagName"));
     }
 
     @Test
     public void testWithStartTimestamp() {
-        SpanBuilder spanBuilder = Mockito.mock(SpanBuilder.class);
-        APIExtensionsSpanBuilder extSpanBuilder = new APIExtensionsSpanBuilder(null, Collections.<TracerObserver>emptyList(),
-                null, spanBuilder);
+        TestResources res = new TestResources();
 
         // Initially should have value, but will be reset to 0 when timestamp explicitly set
-        assertNotEquals(0, extSpanBuilder.startTimeNano());
+        assertNotEquals(0, res.extSpanBuilder.startTimeNano());
 
         long ts = TimeUnit.MILLISECONDS.toMicros(System.currentTimeMillis());
-        extSpanBuilder.withStartTimestamp(ts);
-        Mockito.verify(spanBuilder).withStartTimestamp(ts);
+        res.extSpanBuilder.withStartTimestamp(ts);
+        Mockito.verify(res.spanBuilder).withStartTimestamp(ts);
 
-        assertEquals(0, extSpanBuilder.startTimeNano());
+        assertEquals(0, res.extSpanBuilder.startTimeNano());
     }
 
     @Test
     public void testStartManual() {
-        SpanBuilder spanBuilder = Mockito.mock(SpanBuilder.class);
-        TracerObserver observer = Mockito.mock(TracerObserver.class);
-        APIExtensionsSpanBuilder extSpanBuilder = new APIExtensionsSpanBuilder(null, Collections.singletonList(observer),
-                "op", spanBuilder);
+        TestResources res = new TestResources();
 
-        Span manualSpan = extSpanBuilder.startManual();
+        Span manualSpan = res.extSpanBuilder.startManual();
         assertTrue(manualSpan instanceof APIExtensionsSpan);
         
         APIExtensionsSpan extSpan = (APIExtensionsSpan)manualSpan;
 
-        Mockito.verify(observer).onStart(extSpan);
-        Mockito.verify(spanBuilder).startManual();
+        Mockito.verify(res.observer).onStart(extSpan);
+        Mockito.verify(res.spanBuilder).startManual();
         assertEquals("op", extSpan.getOperationName());
     }
 
     @Test
     public void testStartActive() {
-        Tracer tracer = Mockito.mock(Tracer.class);
-        ActiveSpan activeSpan = Mockito.mock(ActiveSpan.class);
-        SpanBuilder spanBuilder = Mockito.mock(SpanBuilder.class);
-        APIExtensionsSpanBuilder extSpanBuilder = new APIExtensionsSpanBuilder(tracer, Collections.<TracerObserver>emptyList(),
-                null, spanBuilder);
+        TestResources res = new TestResources();
 
-        Mockito.when(tracer.makeActive(spanCaptor.capture())).thenReturn(activeSpan);
+        Mockito.when(res.tracer.makeActive(spanCaptor.capture())).thenReturn(res.activeSpan);
 
-        ActiveSpan extActiveSpan = extSpanBuilder.startActive();
+        ActiveSpan extActiveSpan = res.extSpanBuilder.startActive();
 
-        assertEquals(activeSpan, extActiveSpan);
+        assertEquals(res.activeSpan, extActiveSpan);
         assertTrue(spanCaptor.getValue() instanceof APIExtensionsSpan);
     }
 
+    public class TestResources {
+        public Tracer tracer;
+        public SpanBuilder spanBuilder;
+        public TracerObserver observer;
+        public APIExtensionsSpanBuilder extSpanBuilder;
+        public SpanContext spanContext;
+        public Span span;
+        public ActiveSpan activeSpan;
+        
+        public TestResources() {
+            tracer = Mockito.mock(Tracer.class);
+            spanBuilder = Mockito.mock(SpanBuilder.class);
+            observer = Mockito.mock(TracerObserver.class);
+            extSpanBuilder = new APIExtensionsSpanBuilder(tracer, Collections.singletonList(observer),
+                    "op", spanBuilder);
+            spanContext = Mockito.mock(SpanContext.class);
+            span = Mockito.mock(Span.class);
+            activeSpan = Mockito.mock(ActiveSpan.class);
+        }
+    }
 }
