@@ -49,7 +49,7 @@ public class APIExtensionsSpan implements Span, SpanData  {
      * @param startTimeNano The start nano time, or 0 if the start timestamp was explicitly provided by the app
      * @param tags The initial tags
      */
-    public APIExtensionsSpan(Span span, String operationName,
+    APIExtensionsSpan(Span span, String operationName,
             long startTimestampMicro, long startTimeNano, Map<String,Object> tags) {
         this.wrappedSpan = span;
         this.operationName = operationName;
@@ -104,10 +104,8 @@ public class APIExtensionsSpan implements Span, SpanData  {
     public Span setOperationName(String operationName) {
         wrappedSpan.setOperationName(operationName);
         this.operationName = operationName;
-        if (!observers.isEmpty()) {
-            for (SpanObserver observer : observers) {
-                observer.onSetOperationName(this, operationName);
-            }
+        for (SpanObserver observer : observers) {
+            observer.onSetOperationName(this, operationName);
         }
         return this;
     }
@@ -125,10 +123,8 @@ public class APIExtensionsSpan implements Span, SpanData  {
     @Override
     public Span setBaggageItem(String name, String value) {
         wrappedSpan.setBaggageItem(name, value);
-        if (!observers.isEmpty()) {
-            for (SpanObserver observer : observers) {
-                observer.onSetBaggageItem(this, name, value);
-            }
+        for (SpanObserver observer : observers) {
+            observer.onSetBaggageItem(this, name, value);
         }
         return this;
     }
@@ -146,10 +142,8 @@ public class APIExtensionsSpan implements Span, SpanData  {
     }
 
     private Span handleLog(long timestampMicroseconds, Map<String, ?> fields) {
-        if (!observers.isEmpty()) {
-            for (SpanObserver observer : observers) {
-                observer.onLog(this, timestampMicroseconds, fields);
-            }
+        for (SpanObserver observer : observers) {
+            observer.onLog(this, timestampMicroseconds, fields);
         }
         return this;
     }
@@ -167,10 +161,8 @@ public class APIExtensionsSpan implements Span, SpanData  {
     }
 
     private Span handleLog(long timestampMicroseconds, String event) {
-        if (!observers.isEmpty()) {
-            for (SpanObserver observer : observers) {
-                observer.onLog(this, timestampMicroseconds, event);
-            }
+        for (SpanObserver observer : observers) {
+            observer.onLog(this, timestampMicroseconds, event);
         }
         return this;
     }
@@ -195,10 +187,8 @@ public class APIExtensionsSpan implements Span, SpanData  {
 
     private Span handleSetTag(String key, Object value) {
         tags.put(key, value);
-        if (!observers.isEmpty()) {
-            for (SpanObserver observer : observers) {
-                observer.onSetTag(this, key, value);
-            }
+        for (SpanObserver observer : observers) {
+            observer.onSetTag(this, key, value);
         }
         return this;
     }
@@ -251,10 +241,8 @@ public class APIExtensionsSpan implements Span, SpanData  {
 
     private void handleFinish(long finishMicros) {
         finishTimestampMicro = finishMicros;
-        if (!observers.isEmpty()) {
-            for (SpanObserver observer : observers) {
-                observer.onFinish(this, finishMicros);
-            }
+        for (SpanObserver observer : observers) {
+            observer.onFinish(this, finishMicros);
         }
     }
 

@@ -37,7 +37,7 @@ public class APIExtensionsSpanBuilder implements SpanBuilder {
     private long startTimeNano = System.nanoTime();
     private final Map<String,Object> tags = new ConcurrentHashMap<String,Object>();
 
-    public APIExtensionsSpanBuilder(Tracer tracer, List<TracerObserver> observers,
+    APIExtensionsSpanBuilder(Tracer tracer, List<TracerObserver> observers,
             String operationName, SpanBuilder builder) {
         this.tracer = tracer;
         this.observers = observers;
@@ -108,10 +108,8 @@ public class APIExtensionsSpanBuilder implements SpanBuilder {
     public Span startManual() {
         APIExtensionsSpan span = new APIExtensionsSpan(wrappedBuilder.startManual(),
                 operationName, startTimestampMicro, startTimeNano, tags);
-        if (!observers.isEmpty()) {
-            for (TracerObserver observer : observers) {
-                span.addSpanObserver(observer.onStart(span));
-            }
+        for (TracerObserver observer : observers) {
+            span.addSpanObserver(observer.onStart(span));
         }
         return span;
     }
