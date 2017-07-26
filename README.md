@@ -78,6 +78,28 @@ following dependency:
 
 Using this approach, any `TracerObserver` Spring `@Bean`s will be automatically detected and registered with the API extensions tracer.
 
+3) Using the tracer resolver mechanism
+
+The [tracer resolver](https://github.com/opentracing-contrib/java-tracerresolver) is used to obtain a `Tracer`
+implementation based on the dependencies and environment variables that have been defined. This means that the
+application code can remain independent of the specific tracer implementation that is being used.
+
+This mechanism also enables the resolved `Tracer` to be 'converted' before being returned to the application.
+The following dependency provides such a 'converter', to automatically wrap the resolved `Tracer` with the
+`APIExtensionsTracer`.
+
+```xml
+<dependency>
+  <groupId>io.opentracing.contrib</groupId>
+  <artifactId>opentracing-api-extensions-tracerconverter</artifactId>
+</dependency>
+
+```
+
+Additionally, `TracerObserver` instances can automatically be registered with the `APIExtensionsTracer`
+by providing a service loadable implementation of the interface
+`io.opentracing.contrib.api.tracer.converter.TracerObserverResolver` in the classpath.
+
 
 ## Release
 
