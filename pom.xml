@@ -60,7 +60,7 @@
     <module>opentracing-api-extensions</module>
     <module>opentracing-api-extensions-tracer</module>
     <module>opentracing-api-extensions-tracer-spring-autoconfigure</module>
-    <module>opentracing-api-extensions-tracerconverter</module>
+    <module>opentracing-api-extensions-tracerdecorator</module>
   </modules>
 
   <properties>
