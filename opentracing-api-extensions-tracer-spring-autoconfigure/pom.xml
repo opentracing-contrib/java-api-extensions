@@ -41,12 +41,10 @@
       <artifactId>spring-boot-autoconfigure</artifactId>
       <version>${version.org.springframework.boot}</version>
     </dependency>
-
     <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
-      <version>${version.commons-logging}</version>
-      <scope>provided</scope>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot</artifactId>
+      <version>${version.org.springframework.boot}</version>
     </dependency>
 
     <dependency>
