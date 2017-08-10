@@ -24,7 +24,7 @@
     <version>0.0.3-SNAPSHOT</version>
   </parent>
 
-  <artifactId>opentracing-api-extensions-tracer-autoconfigure</artifactId>
+  <artifactId>opentracing-api-extensions-tracer-spring-autoconfigure</artifactId>
 
   <dependencies>
     <dependency>

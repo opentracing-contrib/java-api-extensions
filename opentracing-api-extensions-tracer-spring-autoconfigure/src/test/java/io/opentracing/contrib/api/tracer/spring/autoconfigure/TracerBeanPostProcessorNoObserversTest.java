@@ -11,66 +11,41 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package io.opentracing.contrib.api.tracer.autoconfigure;
+package io.opentracing.contrib.api.tracer.spring.autoconfigure;
 
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertEquals;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Matchers;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 import io.opentracing.Tracer;
-import io.opentracing.contrib.api.SpanData;
-import io.opentracing.contrib.api.TracerObserver;
 import io.opentracing.mock.MockTracer;
 import io.opentracing.util.ThreadLocalActiveSpanSource;
 
 @SpringBootTest(
-        classes = {TracerBeanPostProcessorTest.SpringConfiguration.class})
+        classes = {TracerBeanPostProcessorNoObserversTest.SpringConfiguration.class})
 @RunWith(SpringJUnit4ClassRunner.class)
-public class TracerBeanPostProcessorTest {
-
-    private static final MockTracer mockTracer = new MockTracer(new ThreadLocalActiveSpanSource());
-
-    private static final TracerObserver tracerObserver = Mockito.mock(TracerObserver.class);
+public class TracerBeanPostProcessorNoObserversTest {
 
     @Configuration
     @EnableAutoConfiguration
     public static class SpringConfiguration {
         @Bean
-        public Tracer tracer() {
-            return mockTracer;
-        }
-
-        @Bean
-        public TracerObserver observer() {
-            return tracerObserver;
+        public MockTracer tracer() {
+            return new MockTracer(new ThreadLocalActiveSpanSource());
         }
     }
 
     @Autowired
     protected Tracer tracer;
 
-    @Before
-    public void before() {
-        mockTracer.reset();
-    }
-
     @Test
-    public void testTracerWrapped() {
-        assertNotEquals(MockTracer.class, tracer.getClass());
-
-        tracer.buildSpan("testop").startManual();
-
-        Mockito.verify(tracerObserver).onStart(Matchers.any(SpanData.class));
+    public void testTracerNotWrapped() {
+        assertEquals(MockTracer.class, tracer.getClass());
     }
-
 }

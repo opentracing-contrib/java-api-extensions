@@ -11,7 +11,7 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package io.opentracing.contrib.api.tracer.autoconfigure;
+package io.opentracing.contrib.api.tracer.spring.autoconfigure;
 
 import java.util.Set;
 
@@ -46,7 +46,7 @@ public class TracerBeanPostProcessor implements BeanPostProcessor {
                 }
             }
             if (observerFound) {
-                log.info("Use extensions API tracer with observers=" + tracerObservers);
+                log.info("Use extensions API tracer to wrap tracer=" + bean + " with observers=" + tracerObservers);
                 return tracer;
             }
         }

@@ -59,7 +59,7 @@
   <modules>
     <module>opentracing-api-extensions</module>
     <module>opentracing-api-extensions-tracer</module>
-    <module>opentracing-api-extensions-tracer-autoconfigure</module>
+    <module>opentracing-api-extensions-tracer-spring-autoconfigure</module>
   </modules>
 
   <properties>

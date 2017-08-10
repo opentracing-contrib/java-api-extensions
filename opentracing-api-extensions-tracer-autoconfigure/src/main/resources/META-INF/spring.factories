@@ -1,2 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-io.opentracing.contrib.api.tracer.autoconfigure.TracerBeanPostProcessor
