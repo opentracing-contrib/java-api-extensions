@@ -19,7 +19,7 @@
   <parent>
     <artifactId>opentracing-api-extensions-parent</artifactId>
     <groupId>io.opentracing.contrib</groupId>
-    <version>0.0.3</version>
+    <version>0.0.4-SNAPSHOT</version>
   </parent>
 
   <artifactId>opentracing-api-extensions</artifactId>
