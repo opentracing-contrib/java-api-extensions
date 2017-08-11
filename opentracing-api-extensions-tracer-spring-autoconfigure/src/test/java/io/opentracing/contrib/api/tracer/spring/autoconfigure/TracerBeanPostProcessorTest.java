@@ -13,7 +13,9 @@
  */
 package io.opentracing.contrib.api.tracer.spring.autoconfigure;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -28,8 +30,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import io.opentracing.Tracer;
+import io.opentracing.contrib.api.APIExtensionsManager;
 import io.opentracing.contrib.api.SpanData;
 import io.opentracing.contrib.api.TracerObserver;
+import io.opentracing.contrib.api.tracer.APIExtensionsTracer;
 import io.opentracing.mock.MockTracer;
 import io.opentracing.util.ThreadLocalActiveSpanSource;
 
@@ -73,4 +77,17 @@ public class TracerBeanPostProcessorTest {
         Mockito.verify(tracerObserver).onStart(Matchers.any(SpanData.class));
     }
 
+    @Test
+    public void testGetWrappedTracerManager() {
+        assertTrue(TracerBeanPostProcessor.getManager(mockTracer) instanceof APIExtensionsTracer);
+    }
+
+    @Test
+    public void testGetManagerFromTracer() {
+        ManagedTracer tracer = Mockito.mock(ManagedTracer.class);
+        assertEquals(tracer, TracerBeanPostProcessor.getManager(tracer));
+    }
+
+    public interface ManagedTracer extends Tracer, APIExtensionsManager {
+    }
 }

@@ -23,6 +23,7 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.annotation.Configuration;
 
 import io.opentracing.Tracer;
+import io.opentracing.contrib.api.APIExtensionsManager;
 import io.opentracing.contrib.api.TracerObserver;
 import io.opentracing.contrib.api.tracer.APIExtensionsTracer;
 
@@ -38,7 +39,7 @@ public class TracerBeanPostProcessor implements BeanPostProcessor {
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         if (tracerObservers != null && bean instanceof Tracer) {
             boolean observerFound = false;
-            APIExtensionsTracer tracer = new APIExtensionsTracer((Tracer)bean);
+            APIExtensionsManager tracer = getManager((Tracer)bean);
             for (TracerObserver observer : tracerObservers) {
                 if (observer != null) {
                     observerFound = true;
@@ -46,11 +47,24 @@ public class TracerBeanPostProcessor implements BeanPostProcessor {
                 }
             }
             if (observerFound) {
-                log.info("Use extensions API tracer to wrap tracer=" + bean + " with observers=" + tracerObservers);
+                log.info("Initialized extensions API manager/tracer="
+                        + tracer + " with observers=" + tracerObservers);
                 return tracer;
             }
         }
         return bean;
+    }
+
+    static APIExtensionsManager getManager(Tracer tracer) {
+        APIExtensionsManager manager = null;
+        if (tracer instanceof APIExtensionsManager) {
+            manager = (APIExtensionsManager)tracer;
+            log.info("Use existing extensions API manager/tracer=" + manager);
+        } else {
+            manager = new APIExtensionsTracer(tracer);
+            log.info("Use extensions API wrapper tracer=" + manager + " to wrap original tracer=" + tracer);
+        }
+        return manager;
     }
 
     @Override
