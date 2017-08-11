@@ -13,6 +13,7 @@
  */
 package io.opentracing.contrib.api.tracer;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -119,8 +120,8 @@ public class APIExtensionsSpanBuilder implements SpanBuilder {
         return startManual();
     }
 
-    Map<String, Object> tags() {
-        return tags;
+    public Map<String, Object> tags() {
+        return Collections.unmodifiableMap(tags);
     }
 
     long startTimeNano() {
