@@ -38,13 +38,13 @@ for each call to `TracerObserver.onStart()`.
 
 ## Registering API extensions
 
-There are three ways an extension API can be registered for use with a `Tracer`.
+There are several ways an extension API can be registered for use with a `Tracer`.
 
 1) Native support within the `Tracer` implementation
 
-Some `Tracer` implementations may decide to implement support for the extension APIs directly, in which
-case they will implement the `APIExtensionsManager` interface which can be used for registering the API
-extensions.
+Some `Tracer` implementations may decide to implement support for the extension APIs directly, by implementing the
+[APIExtensionsManager](opentracing-api-extensions/src/main/java/io/opentracing/contrib/api/APIExtensionsManager.java) 
+interface which can be used for registering the API extensions.
 
 2) Using the extension `Tracer` wrapper
 
@@ -56,8 +56,8 @@ extensions.
 
 ```
 
-The `io.opentracing.contrib.api.tracer.APIExtensionsTracer` provides a single constructor which is supplied
-the `Tracer` instance to be wrapped.
+The [APIExtensionsTracer](opentracing-api-extensions-tracer/src/main/java/io/opentracing/contrib/api/tracer/APIExtensionsTracer.java)
+provides a single constructor which is supplied the `Tracer` instance to be wrapped.
 
 This class also implements the `APIExtensionsManager` interface, which provides `addTracerObserver` and 
 `removeTracerObserver` methods to enable a `TracerObserver` instance to be registered with the tracer wrapper,
@@ -76,9 +76,7 @@ following dependency:
 
 ```
 
-Using this approach, `TracerObserver` instances can be defined as Spring `@Bean`s, and they will automatically be
-detected and registered with the API extensions tracer.
-
+Using this approach, any `TracerObserver` Spring `@Bean`s will be automatically detected and registered with the API extensions tracer.
 
 
 ## Release

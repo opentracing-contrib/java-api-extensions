@@ -55,14 +55,14 @@ public class TracerBeanPostProcessor implements BeanPostProcessor {
         return bean;
     }
 
-    static APIExtensionsManager getManager(Tracer tracer) {
+    private static APIExtensionsManager getManager(Tracer tracer) {
         APIExtensionsManager manager = null;
         if (tracer instanceof APIExtensionsManager) {
             manager = (APIExtensionsManager)tracer;
-            log.info("Use existing extensions API manager/tracer=" + manager);
+            log.debug("Use existing extensions API manager/tracer=" + manager);
         } else {
             manager = new APIExtensionsTracer(tracer);
-            log.info("Use extensions API wrapper tracer=" + manager + " to wrap original tracer=" + tracer);
+            log.debug("Use extensions API wrapper tracer=" + manager + " to wrap original tracer=" + tracer);
         }
         return manager;
     }
