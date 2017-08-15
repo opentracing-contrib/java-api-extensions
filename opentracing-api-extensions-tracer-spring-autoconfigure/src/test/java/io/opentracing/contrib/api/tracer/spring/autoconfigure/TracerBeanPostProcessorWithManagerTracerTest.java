@@ -13,11 +13,9 @@
  */
 package io.opentracing.contrib.api.tracer.spring.autoconfigure;
 
-import static org.junit.Assert.assertNotEquals;
-import org.junit.Before;
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -27,17 +25,15 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import io.opentracing.Tracer;
-import io.opentracing.contrib.api.SpanData;
+import io.opentracing.contrib.api.APIExtensionsManager;
 import io.opentracing.contrib.api.TracerObserver;
-import io.opentracing.mock.MockTracer;
-import io.opentracing.util.ThreadLocalActiveSpanSource;
 
 @SpringBootTest(
-        classes = {TracerBeanPostProcessorTest.SpringConfiguration.class})
+        classes = {TracerBeanPostProcessorWithManagerTracerTest.SpringConfiguration.class})
 @RunWith(SpringJUnit4ClassRunner.class)
-public class TracerBeanPostProcessorTest {
+public class TracerBeanPostProcessorWithManagerTracerTest {
 
-    private static final MockTracer mockTracer = new MockTracer(new ThreadLocalActiveSpanSource());
+    private static final ManagedTracer mockTracer = Mockito.mock(ManagedTracer.class);
 
     private static final TracerObserver tracerObserver = Mockito.mock(TracerObserver.class);
 
@@ -58,18 +54,12 @@ public class TracerBeanPostProcessorTest {
     @Autowired
     protected Tracer tracer;
 
-    @Before
-    public void before() {
-        mockTracer.reset();
-    }
-
     @Test
-    public void testTracerWrapped() {
-        assertNotEquals(MockTracer.class, tracer.getClass());
-
-        tracer.buildSpan("testop").startManual();
-
-        Mockito.verify(tracerObserver).onStart(Matchers.any(SpanData.class));
+    public void testTracerNotWrapped() {
+        assertEquals(mockTracer, tracer);
+        Mockito.verify(mockTracer).addTracerObserver(tracerObserver);
     }
 
+    public interface ManagedTracer extends Tracer, APIExtensionsManager {
+    }
 }

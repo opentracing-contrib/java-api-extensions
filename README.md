@@ -38,12 +38,13 @@ for each call to `TracerObserver.onStart()`.
 
 ## Registering API extensions
 
-There are two ways an extension API can be registered for use with a `Tracer`.
+There are several ways an extension API can be registered for use with a `Tracer`.
 
 1) Native support within the `Tracer` implementation
 
-Some `Tracer` implementations may decide to implement support for the extension APIs directly, in which
-case an implementation specific mechanism will be provided for registering the APIs.
+Some `Tracer` implementations may decide to implement support for the extension APIs directly, by implementing the
+[APIExtensionsManager](opentracing-api-extensions/src/main/java/io/opentracing/contrib/api/APIExtensionsManager.java) 
+interface which can be used for registering the API extensions.
 
 2) Using the extension `Tracer` wrapper
 
@@ -55,14 +56,31 @@ case an implementation specific mechanism will be provided for registering the A
 
 ```
 
-The `io.opentracing.contrib.api.tracer.APIExtensionsTracer` provides a single constructor which is supplied
-the `Tracer` instance to be wrapped.
+The [APIExtensionsTracer](opentracing-api-extensions-tracer/src/main/java/io/opentracing/contrib/api/tracer/APIExtensionsTracer.java)
+provides a single constructor which is supplied the `Tracer` instance to be wrapped.
 
-This class also provides `addTracerObserver` and `removeTracerObserver` methods to enable a `TracerObserver`
-instance to be registered with the tracer wrapper, and perform relevant tasks when new spans are started.
+This class also implements the `APIExtensionsManager` interface, which provides `addTracerObserver` and 
+`removeTracerObserver` methods to enable a `TracerObserver` instance to be registered with the tracer wrapper,
+and perform relevant tasks when new spans are started.
+
+3) Spring Auto Configuration
+
+If using Spring, then it is possible to auto-configure the API extensions tracer mentioned above by adding the
+following dependency:
+
+```xml
+<dependency>
+  <groupId>io.opentracing.contrib</groupId>
+  <artifactId>opentracing-api-extensions-tracer-spring-autoconfigure</artifactId>
+</dependency>
+
+```
+
+Using this approach, any `TracerObserver` Spring `@Bean`s will be automatically detected and registered with the API extensions tracer.
 
 
 ## Release
+
 Follow instructions in [RELEASE](RELEASE.md)
 
    [ci-img]: https://travis-ci.org/opentracing-contrib/java-api-extensions.svg?branch=master

@@ -19,10 +19,11 @@ import io.opentracing.ActiveSpan;
 import io.opentracing.Span;
 import io.opentracing.SpanContext;
 import io.opentracing.Tracer;
+import io.opentracing.contrib.api.APIExtensionsManager;
 import io.opentracing.contrib.api.TracerObserver;
 import io.opentracing.propagation.Format;
 
-public class APIExtensionsTracer implements Tracer {
+public class APIExtensionsTracer implements Tracer, APIExtensionsManager {
 
     private final Tracer wrappedTracer;
     private final List<TracerObserver> observers = new CopyOnWriteArrayList<TracerObserver>();
@@ -31,12 +32,14 @@ public class APIExtensionsTracer implements Tracer {
         this.wrappedTracer = tracer;
     }
 
+    @Override
     public void addTracerObserver(TracerObserver observer) {
         if (observer != null) {
             observers.add(observer);
         }
     }
 
+    @Override
     public void removeTracerObserver(TracerObserver observer) {
         if (observer != null) {
             observers.remove(observer);
