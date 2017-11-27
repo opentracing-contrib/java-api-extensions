@@ -19,6 +19,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import io.opentracing.ActiveSpan;
+import io.opentracing.NoopTracerFactory;
 import io.opentracing.Span;
 import io.opentracing.Tracer;
 
@@ -48,12 +49,15 @@ public class APIExtensionsTracerTest {
     @Test
     public void testBuild() {
         Tracer tracer = Mockito.mock(Tracer.class);
-        ActiveSpan activeSpan = Mockito.mock(ActiveSpan.class);
-        Span span = Mockito.mock(Span.class);
-        Mockito.when(tracer.makeActive(span)).thenReturn(activeSpan);
         
         APIExtensionsTracer extTracer = new APIExtensionsTracer(tracer);
-        extTracer.buildSpan("testop");
+        assertTrue(extTracer.buildSpan("testop") instanceof APIExtensionsSpanBuilder);
+    }
+
+    @Test
+    public void testBuildNoopTracer() {
+        APIExtensionsTracer extTracer = new APIExtensionsTracer(NoopTracerFactory.create());
+        assertTrue(extTracer.buildSpan("testop") instanceof APIExtensionsSpanBuilder);
     }
 
 }

@@ -16,20 +16,30 @@ package io.opentracing.contrib.api.tracer;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import io.opentracing.ActiveSpan;
+import io.opentracing.ActiveSpanSource;
+import io.opentracing.NoopTracer;
 import io.opentracing.Span;
 import io.opentracing.SpanContext;
 import io.opentracing.Tracer;
 import io.opentracing.contrib.api.APIExtensionsManager;
 import io.opentracing.contrib.api.TracerObserver;
 import io.opentracing.propagation.Format;
+import io.opentracing.util.ThreadLocalActiveSpanSource;
 
 public class APIExtensionsTracer implements Tracer, APIExtensionsManager {
 
     private final Tracer wrappedTracer;
     private final List<TracerObserver> observers = new CopyOnWriteArrayList<TracerObserver>();
+    private final ActiveSpanSource activeSpanSource;
 
     public APIExtensionsTracer(Tracer tracer) {
-        this.wrappedTracer = tracer;
+        if (tracer instanceof NoopTracer) {
+            this.activeSpanSource = new ThreadLocalActiveSpanSource();
+            this.wrappedTracer = null;
+        } else {
+            this.activeSpanSource = null;
+            this.wrappedTracer = tracer;
+        }
     }
 
     @Override
@@ -48,27 +58,39 @@ public class APIExtensionsTracer implements Tracer, APIExtensionsManager {
 
     @Override
     public ActiveSpan activeSpan() {
-        return wrappedTracer.activeSpan();
+        if (wrappedTracer != null) {
+            return wrappedTracer.activeSpan();
+        }
+        return activeSpanSource.activeSpan();
     }
 
     @Override
     public ActiveSpan makeActive(Span span) {
-        return wrappedTracer.makeActive(span);
+        if (wrappedTracer != null) {
+            return wrappedTracer.makeActive(span);
+        }
+        return activeSpanSource.makeActive(span);
     }
 
     @Override
     public SpanBuilder buildSpan(String operation) {
-        return new APIExtensionsSpanBuilder(wrappedTracer, observers, operation, wrappedTracer.buildSpan(operation));
+        return new APIExtensionsSpanBuilder(this, observers, operation,
+                (wrappedTracer == null ? null : wrappedTracer.buildSpan(operation)));
     }
 
     @Override
     public <C> SpanContext extract(Format<C> format, C carrier) {
-        return wrappedTracer.extract(format, carrier);
+        if (wrappedTracer != null) {
+            return wrappedTracer.extract(format, carrier);
+        }
+        return null;
     }
 
     @Override
     public <C> void inject(SpanContext context, Format<C> format, C carrier) {
-        wrappedTracer.inject(context, format, carrier);
+        if (wrappedTracer != null) {
+            wrappedTracer.inject(context, format, carrier);
+        }
     }
 
 }

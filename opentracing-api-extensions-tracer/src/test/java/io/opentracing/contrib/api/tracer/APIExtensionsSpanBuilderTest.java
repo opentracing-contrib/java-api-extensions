@@ -15,11 +15,16 @@ package io.opentracing.contrib.api.tracer;
 
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mockito;
@@ -33,11 +38,33 @@ import io.opentracing.Tracer;
 import io.opentracing.Tracer.SpanBuilder;
 import io.opentracing.contrib.api.TracerObserver;
 
+@RunWith(Parameterized.class)
 public class APIExtensionsSpanBuilderTest {
+
+    private SpanBuilderFactory spanBuilderFactory;
 
     @Captor
     private ArgumentCaptor<Span> spanCaptor;
     
+    public APIExtensionsSpanBuilderTest(SpanBuilderFactory spanBuilderFactory) {
+        this.spanBuilderFactory = spanBuilderFactory;
+    }
+
+    @Parameters
+    public static Collection<SpanBuilderFactory> factories() {
+        return Arrays.<SpanBuilderFactory>asList(new SpanBuilderFactory() {
+            @Override
+            public SpanBuilder create() {
+                return Mockito.mock(SpanBuilder.class);
+            }            
+        },new SpanBuilderFactory() {
+            @Override
+            public SpanBuilder create() {
+                return null;
+            }            
+        });
+    }
+
     @Before
     public void init(){
        MockitoAnnotations.initMocks(this);
@@ -48,7 +75,9 @@ public class APIExtensionsSpanBuilderTest {
         TestResources res = new TestResources();
 
         res.extSpanBuilder.asChildOf(res.spanContext);
-        Mockito.verify(res.spanBuilder).asChildOf(res.spanContext);
+        if (res.spanBuilder != null) {
+            Mockito.verify(res.spanBuilder).asChildOf(res.spanContext);
+        }
     }
 
     @Test
@@ -56,7 +85,9 @@ public class APIExtensionsSpanBuilderTest {
         TestResources res = new TestResources();
 
         res.extSpanBuilder.asChildOf(res.span);
-        Mockito.verify(res.spanBuilder).asChildOf(res.span);
+        if (res.spanBuilder != null) {
+            Mockito.verify(res.spanBuilder).asChildOf(res.span);
+        }
     }
 
     @Test
@@ -64,7 +95,9 @@ public class APIExtensionsSpanBuilderTest {
         TestResources res = new TestResources();
 
         res.extSpanBuilder.addReference(References.FOLLOWS_FROM, res.spanContext);
-        Mockito.verify(res.spanBuilder).addReference(References.FOLLOWS_FROM, res.spanContext);
+        if (res.spanBuilder != null) {
+            Mockito.verify(res.spanBuilder).addReference(References.FOLLOWS_FROM, res.spanContext);
+        }
     }
 
     @Test
@@ -72,7 +105,9 @@ public class APIExtensionsSpanBuilderTest {
         TestResources res = new TestResources();
         
         res.extSpanBuilder.ignoreActiveSpan();
-        Mockito.verify(res.spanBuilder).ignoreActiveSpan();
+        if (res.spanBuilder != null) {
+            Mockito.verify(res.spanBuilder).ignoreActiveSpan();
+        }
     }
 
     @Test
@@ -80,7 +115,9 @@ public class APIExtensionsSpanBuilderTest {
         TestResources res = new TestResources();
 
         res.extSpanBuilder.withTag("tagName", "tagValue");
-        Mockito.verify(res.spanBuilder).withTag("tagName", "tagValue");
+        if (res.spanBuilder != null) {
+            Mockito.verify(res.spanBuilder).withTag("tagName", "tagValue");
+        }
         assertEquals("tagValue", res.extSpanBuilder.tags().get("tagName"));
     }
 
@@ -89,7 +126,9 @@ public class APIExtensionsSpanBuilderTest {
         TestResources res = new TestResources();
         
         res.extSpanBuilder.withTag("tagName", 5);
-        Mockito.verify(res.spanBuilder).withTag("tagName", 5);
+        if (res.spanBuilder != null) {
+            Mockito.verify(res.spanBuilder).withTag("tagName", 5);
+        }
         assertEquals(5, res.extSpanBuilder.tags().get("tagName"));
     }
 
@@ -98,7 +137,9 @@ public class APIExtensionsSpanBuilderTest {
         TestResources res = new TestResources();
         
         res.extSpanBuilder.withTag("tagName", Boolean.TRUE);
-        Mockito.verify(res.spanBuilder).withTag("tagName", Boolean.TRUE);
+        if (res.spanBuilder != null) {
+            Mockito.verify(res.spanBuilder).withTag("tagName", Boolean.TRUE);
+        }
         assertEquals(Boolean.TRUE, res.extSpanBuilder.tags().get("tagName"));
     }
 
@@ -111,7 +152,9 @@ public class APIExtensionsSpanBuilderTest {
 
         long ts = TimeUnit.MILLISECONDS.toMicros(System.currentTimeMillis());
         res.extSpanBuilder.withStartTimestamp(ts);
-        Mockito.verify(res.spanBuilder).withStartTimestamp(ts);
+        if (res.spanBuilder != null) {
+            Mockito.verify(res.spanBuilder).withStartTimestamp(ts);
+        }
 
         assertEquals(0, res.extSpanBuilder.startTimeNano());
     }
@@ -126,7 +169,9 @@ public class APIExtensionsSpanBuilderTest {
         APIExtensionsSpan extSpan = (APIExtensionsSpan)manualSpan;
 
         Mockito.verify(res.observer).onStart(extSpan);
-        Mockito.verify(res.spanBuilder).startManual();
+        if (res.spanBuilder != null) {
+            Mockito.verify(res.spanBuilder).startManual();
+        }
         assertEquals("op", extSpan.getOperationName());
     }
 
@@ -153,7 +198,7 @@ public class APIExtensionsSpanBuilderTest {
         
         public TestResources() {
             tracer = Mockito.mock(Tracer.class);
-            spanBuilder = Mockito.mock(SpanBuilder.class);
+            spanBuilder = spanBuilderFactory.create();
             observer = Mockito.mock(TracerObserver.class);
             extSpanBuilder = new APIExtensionsSpanBuilder(tracer, Collections.singletonList(observer),
                     "op", spanBuilder);
@@ -161,5 +206,9 @@ public class APIExtensionsSpanBuilderTest {
             span = Mockito.mock(Span.class);
             activeSpan = Mockito.mock(ActiveSpan.class);
         }
+    }
+
+    public interface SpanBuilderFactory {
+        public SpanBuilder create();
     }
 }

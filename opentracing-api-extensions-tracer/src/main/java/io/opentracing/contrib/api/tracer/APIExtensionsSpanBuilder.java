@@ -48,52 +48,68 @@ public class APIExtensionsSpanBuilder implements SpanBuilder {
 
     @Override
     public SpanBuilder asChildOf(SpanContext parent) {
-        wrappedBuilder.asChildOf(parent);
+        if (wrappedBuilder != null) {
+            wrappedBuilder.asChildOf(parent);
+        }
         return this;
     }
 
     @Override
     public SpanBuilder asChildOf(BaseSpan<?> parent) {
-        wrappedBuilder.asChildOf(parent);
+        if (wrappedBuilder != null) {
+            wrappedBuilder.asChildOf(parent);
+        }
         return this;
     }
 
     @Override
     public SpanBuilder addReference(String referenceType, SpanContext referencedContext) {
-        wrappedBuilder.addReference(referenceType, referencedContext);
+        if (wrappedBuilder != null) {
+            wrappedBuilder.addReference(referenceType, referencedContext);
+        }
         return this;
     }
 
     @Override
     public SpanBuilder ignoreActiveSpan() {
-        wrappedBuilder.ignoreActiveSpan();
+        if (wrappedBuilder != null) {
+            wrappedBuilder.ignoreActiveSpan();
+        }
         return this;
     }
 
     @Override
     public SpanBuilder withTag(String key, String value) {
         tags.put(key, value);
-        wrappedBuilder.withTag(key, value);
+        if (wrappedBuilder != null) {
+            wrappedBuilder.withTag(key, value);
+        }
         return this;
     }
 
     @Override
     public SpanBuilder withTag(String key, boolean value) {
         tags.put(key, value);
-        wrappedBuilder.withTag(key, value);
+        if (wrappedBuilder != null) {
+            wrappedBuilder.withTag(key, value);
+        }
         return this;
     }
 
     @Override
     public SpanBuilder withTag(String key, Number value) {
         tags.put(key, value);
-        wrappedBuilder.withTag(key, value);
+        if (wrappedBuilder != null) {
+            wrappedBuilder.withTag(key, value);
+        }
         return this;
     }
 
     @Override
     public SpanBuilder withStartTimestamp(long microseconds) {
-        wrappedBuilder.withStartTimestamp(microseconds);
+        if (wrappedBuilder != null) {
+            wrappedBuilder.withStartTimestamp(microseconds);
+        }
         // Reset the nano start time, so that duration will be calculated based on explicitly
         // provided timestamps
         this.startTimeNano = 0;
@@ -107,7 +123,8 @@ public class APIExtensionsSpanBuilder implements SpanBuilder {
 
     @Override
     public Span startManual() {
-        APIExtensionsSpan span = new APIExtensionsSpan(wrappedBuilder.startManual(),
+        APIExtensionsSpan span = new APIExtensionsSpan(
+                (wrappedBuilder == null ? null : wrappedBuilder.startManual()),
                 operationName, startTimestampMicro, startTimeNano, tags);
         for (TracerObserver observer : observers) {
             span.addSpanObserver(observer.onStart(span));

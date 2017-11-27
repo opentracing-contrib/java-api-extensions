@@ -20,6 +20,7 @@ import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
+import io.opentracing.NoopSpanContext;
 import io.opentracing.Span;
 import io.opentracing.SpanContext;
 import io.opentracing.contrib.api.SpanData;
@@ -82,7 +83,10 @@ public class APIExtensionsSpan implements Span, SpanData  {
 
     @Override
     public SpanContext context() {
-        return wrappedSpan.context();
+        if (wrappedSpan != null) {
+            return wrappedSpan.context();
+        }
+        return SpanContextImpl.INSTANCE;
     }
 
     @Override
@@ -102,7 +106,9 @@ public class APIExtensionsSpan implements Span, SpanData  {
 
     @Override
     public Span setOperationName(String operationName) {
-        wrappedSpan.setOperationName(operationName);
+        if (wrappedSpan != null) {
+            wrappedSpan.setOperationName(operationName);
+        }
         this.operationName = operationName;
         for (SpanObserver observer : observers) {
             observer.onSetOperationName(this, operationName);
@@ -117,12 +123,17 @@ public class APIExtensionsSpan implements Span, SpanData  {
 
     @Override
     public String getBaggageItem(String name) {
-        return wrappedSpan.getBaggageItem(name);
+        if (wrappedSpan != null) {
+            return wrappedSpan.getBaggageItem(name);
+        }
+        return null;
     }
 
     @Override
     public Span setBaggageItem(String name, String value) {
-        wrappedSpan.setBaggageItem(name, value);
+        if (wrappedSpan != null) {
+            wrappedSpan.setBaggageItem(name, value);
+        }
         for (SpanObserver observer : observers) {
             observer.onSetBaggageItem(this, name, value);
         }
@@ -131,13 +142,17 @@ public class APIExtensionsSpan implements Span, SpanData  {
 
     @Override
     public Span log(Map<String, ?> fields) {
-        wrappedSpan.log(fields);
+        if (wrappedSpan != null) {
+            wrappedSpan.log(fields);
+        }
         return handleLog(TimeUnit.MILLISECONDS.toMicros(System.currentTimeMillis()), fields);
     }
 
     @Override
     public Span log(long timestampMicroseconds, Map<String, ?> fields) {
-        wrappedSpan.log(timestampMicroseconds, fields);
+        if (wrappedSpan != null) {
+            wrappedSpan.log(timestampMicroseconds, fields);
+        }
         return handleLog(timestampMicroseconds, fields);
     }
 
@@ -150,13 +165,17 @@ public class APIExtensionsSpan implements Span, SpanData  {
 
     @Override
     public Span log(String event) {
-        wrappedSpan.log(event);
+        if (wrappedSpan != null) {
+            wrappedSpan.log(event);
+        }
         return handleLog(TimeUnit.MILLISECONDS.toMicros(System.currentTimeMillis()), event);
     }
 
     @Override
     public Span log(long timestampMicroseconds, String event) {
-        wrappedSpan.log(timestampMicroseconds, event);
+        if (wrappedSpan != null) {
+            wrappedSpan.log(timestampMicroseconds, event);
+        }
         return handleLog(timestampMicroseconds, event);
     }
 
@@ -169,19 +188,25 @@ public class APIExtensionsSpan implements Span, SpanData  {
 
     @Override
     public Span setTag(String key, String value) {
-        wrappedSpan.setTag(key, value);
+        if (wrappedSpan != null) {
+            wrappedSpan.setTag(key, value);
+        }
         return handleSetTag(key, value);
     }
     
     @Override
     public Span setTag(String key, boolean value) {
-        wrappedSpan.setTag(key, value);
+        if (wrappedSpan != null) {
+            wrappedSpan.setTag(key, value);
+        }
         return handleSetTag(key, value);
     }
 
     @Override
     public Span setTag(String key, Number value) {
-        wrappedSpan.setTag(key, value);
+        if (wrappedSpan != null) {
+            wrappedSpan.setTag(key, value);
+        }
         return handleSetTag(key, value);
     }
 
@@ -227,7 +252,9 @@ public class APIExtensionsSpan implements Span, SpanData  {
 
     @Override
     public void finish() {
-        wrappedSpan.finish();
+        if (wrappedSpan != null) {
+            wrappedSpan.finish();
+        }
         // Only set the finish nano time if not explicitly providing a timestamp
         finishTimeNano = System.nanoTime();
         handleFinish(TimeUnit.MILLISECONDS.toMicros(System.currentTimeMillis()));
@@ -235,7 +262,9 @@ public class APIExtensionsSpan implements Span, SpanData  {
 
     @Override
     public void finish(long finishMicros) {
-        wrappedSpan.finish(finishMicros);
+        if (wrappedSpan != null) {
+            wrappedSpan.finish(finishMicros);
+        }
         handleFinish(finishMicros);
     }
 
@@ -258,13 +287,31 @@ public class APIExtensionsSpan implements Span, SpanData  {
     @SuppressWarnings("deprecation")
     @Override
     public Span log(String eventName, Object payload) {
-        return wrappedSpan.log(eventName, payload);
+        if (wrappedSpan != null) {
+            wrappedSpan.log(eventName, payload);
+        }
+        return this;
     }
 
     @SuppressWarnings("deprecation")
     @Override
     public Span log(long timestampMicroseconds, String eventName, Object payload) {
-        return wrappedSpan.log(timestampMicroseconds, eventName, payload);
+        if (wrappedSpan != null) {
+            wrappedSpan.log(timestampMicroseconds, eventName, payload);
+        }
+        return this;
     }
 
+   static class SpanContextImpl implements NoopSpanContext {
+        static final SpanContextImpl INSTANCE = new SpanContextImpl();
+
+        @Override
+        public Iterable<Map.Entry<String, String>> baggageItems() {
+            return Collections.emptyList();
+        }
+
+        @Override
+        public String toString() { return SpanContext.class.getSimpleName(); }
+
+    }
 }

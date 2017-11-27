@@ -16,25 +16,53 @@ package io.opentracing.contrib.api.tracer;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.verify;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import io.opentracing.Span;
 import io.opentracing.contrib.api.SpanObserver;
 
+@RunWith(Parameterized.class)
 public class APIExtensionsSpanTest {
+
+    private SpanFactory spanFactory;
 
     @Captor
     private ArgumentCaptor<Long> longCaptor;
     
+    public APIExtensionsSpanTest(SpanFactory spanFactory) {
+        this.spanFactory = spanFactory;
+    }
+
+    @Parameters
+    public static Collection<SpanFactory> factories() {
+        return Arrays.<SpanFactory>asList(new SpanFactory() {
+            @Override
+            public Span create() {
+                return Mockito.mock(Span.class);
+            }            
+        },new SpanFactory() {
+            @Override
+            public Span create() {
+                return null;
+            }            
+        });
+    }
+
     @Before
     public void init(){
        MockitoAnnotations.initMocks(this);
@@ -52,7 +80,7 @@ public class APIExtensionsSpanTest {
 
     @Test
     public void testGetDurationFromTimestampsFinished() throws InterruptedException {
-        APIExtensionsSpan span = new APIExtensionsSpan(Mockito.mock(Span.class), null,
+        APIExtensionsSpan span = new APIExtensionsSpan(spanFactory.create(), null,
                 TimeUnit.MILLISECONDS.toMicros(System.currentTimeMillis()), 0, null);
         synchronized(this) {
             wait(100);
@@ -73,7 +101,7 @@ public class APIExtensionsSpanTest {
 
     @Test
     public void testGetDurationFromNanosFinished() throws InterruptedException {
-        APIExtensionsSpan span = new APIExtensionsSpan(Mockito.mock(Span.class), null,
+        APIExtensionsSpan span = new APIExtensionsSpan(spanFactory.create(), null,
                 TimeUnit.MILLISECONDS.toMicros(System.currentTimeMillis()), System.nanoTime(), null);
         synchronized(this) {
             wait(100);
@@ -84,7 +112,7 @@ public class APIExtensionsSpanTest {
 
     @Test
     public void testGetDurationNanosAccuracy() throws InterruptedException {
-        APIExtensionsSpan span = new APIExtensionsSpan(Mockito.mock(Span.class), null,
+        APIExtensionsSpan span = new APIExtensionsSpan(spanFactory.create(), null,
                 TimeUnit.MILLISECONDS.toMicros(System.currentTimeMillis()), System.nanoTime(), null);
         synchronized(this) {
             wait(100);
@@ -95,7 +123,7 @@ public class APIExtensionsSpanTest {
 
     @Test
     public void testGetDurationExplicitStartMillisAccuracy() throws InterruptedException {
-        APIExtensionsSpan span = new APIExtensionsSpan(Mockito.mock(Span.class), null,
+        APIExtensionsSpan span = new APIExtensionsSpan(spanFactory.create(), null,
                 TimeUnit.MILLISECONDS.toMicros(System.currentTimeMillis()), 0, null);
         synchronized(this) {
             wait(100);
@@ -106,7 +134,7 @@ public class APIExtensionsSpanTest {
 
     @Test
     public void testGetDurationExplicitFinishMillisAccuracy() throws InterruptedException {
-        APIExtensionsSpan span = new APIExtensionsSpan(Mockito.mock(Span.class), null,
+        APIExtensionsSpan span = new APIExtensionsSpan(spanFactory.create(), null,
                 TimeUnit.MILLISECONDS.toMicros(System.currentTimeMillis()), System.nanoTime(), null);
         synchronized(this) {
             wait(100);
@@ -117,7 +145,8 @@ public class APIExtensionsSpanTest {
 
     @Test
     public void testOnSetOperationName() throws InterruptedException {
-        APIExtensionsSpan span = new APIExtensionsSpan(Mockito.mock(Span.class), null,
+        Span testSpan = spanFactory.create();
+        APIExtensionsSpan span = new APIExtensionsSpan(testSpan, null,
                 0, 0, null);
         SpanObserver observer = Mockito.mock(SpanObserver.class);
         span.addSpanObserver(observer);
@@ -125,11 +154,15 @@ public class APIExtensionsSpanTest {
         span.setOperationName("testop");
 
         verify(observer).onSetOperationName(span, "testop");
+        if (testSpan != null) {
+            verify(testSpan).setOperationName("testop");
+        }
     }
 
     @Test
     public void testOnSetTagString() throws InterruptedException {
-        APIExtensionsSpan span = new APIExtensionsSpan(Mockito.mock(Span.class), null,
+        Span testSpan = spanFactory.create();
+        APIExtensionsSpan span = new APIExtensionsSpan(testSpan, null,
                 0, 0, new HashMap<String, Object>());
         SpanObserver observer = Mockito.mock(SpanObserver.class);
         span.addSpanObserver(observer);
@@ -137,11 +170,15 @@ public class APIExtensionsSpanTest {
         span.setTag("testkey", "testvalue");
 
         verify(observer).onSetTag(span, "testkey", "testvalue");
+        if (testSpan != null) {
+            verify(testSpan).setTag("testkey", "testvalue");
+        }
     }
 
     @Test
     public void testOnSetTagNumber() throws InterruptedException {
-        APIExtensionsSpan span = new APIExtensionsSpan(Mockito.mock(Span.class), null,
+        Span testSpan = spanFactory.create();
+        APIExtensionsSpan span = new APIExtensionsSpan(testSpan, null,
                 0, 0, new HashMap<String, Object>());
         SpanObserver observer = Mockito.mock(SpanObserver.class);
         span.addSpanObserver(observer);
@@ -149,11 +186,15 @@ public class APIExtensionsSpanTest {
         span.setTag("testkey", 5);
 
         verify(observer).onSetTag(span, "testkey", 5);
+        if (testSpan != null) {
+            verify(testSpan).setTag("testkey", 5);
+        }
     }
 
     @Test
     public void testOnSetTagBoolean() throws InterruptedException {
-        APIExtensionsSpan span = new APIExtensionsSpan(Mockito.mock(Span.class), null,
+        Span testSpan = spanFactory.create();
+        APIExtensionsSpan span = new APIExtensionsSpan(testSpan, null,
                 0, 0, new HashMap<String, Object>());
         SpanObserver observer = Mockito.mock(SpanObserver.class);
         span.addSpanObserver(observer);
@@ -161,11 +202,15 @@ public class APIExtensionsSpanTest {
         span.setTag("testkey", Boolean.TRUE);
 
         verify(observer).onSetTag(span, "testkey", Boolean.TRUE);
+        if (testSpan != null) {
+            verify(testSpan).setTag("testkey", Boolean.TRUE);
+        }
     }
 
     @Test
     public void testOnSetBaggageItem() throws InterruptedException {
-        APIExtensionsSpan span = new APIExtensionsSpan(Mockito.mock(Span.class), null,
+        Span testSpan = spanFactory.create();
+        APIExtensionsSpan span = new APIExtensionsSpan(testSpan, null,
                 0, 0, null);
         SpanObserver observer = Mockito.mock(SpanObserver.class);
         span.addSpanObserver(observer);
@@ -173,11 +218,15 @@ public class APIExtensionsSpanTest {
         span.setBaggageItem("testkey", "testvalue");
 
         verify(observer).onSetBaggageItem(span, "testkey", "testvalue");
+        if (testSpan != null) {
+            verify(testSpan).setBaggageItem("testkey", "testvalue");
+        }
     }
 
     @Test
     public void testOnLogFields() throws InterruptedException {
-        APIExtensionsSpan span = new APIExtensionsSpan(Mockito.mock(Span.class), null,
+        Span testSpan = spanFactory.create();
+        APIExtensionsSpan span = new APIExtensionsSpan(testSpan, null,
                 0, 0, null);
         SpanObserver observer = Mockito.mock(SpanObserver.class);
         span.addSpanObserver(observer);
@@ -187,11 +236,15 @@ public class APIExtensionsSpanTest {
         span.log(ts, fields);
 
         verify(observer).onLog(span, ts, fields);
+        if (testSpan != null) {
+            verify(testSpan).log(ts, fields);
+        }
     }
 
     @Test
     public void testOnLogEvent() throws InterruptedException {
-        APIExtensionsSpan span = new APIExtensionsSpan(Mockito.mock(Span.class), null,
+        Span testSpan = spanFactory.create();
+        APIExtensionsSpan span = new APIExtensionsSpan(testSpan, null,
                 0, 0, null);
         SpanObserver observer = Mockito.mock(SpanObserver.class);
         span.addSpanObserver(observer);
@@ -200,24 +253,32 @@ public class APIExtensionsSpanTest {
         span.log(ts, "testevent");
 
         verify(observer).onLog(span, ts, "testevent");
+        if (testSpan != null) {
+            verify(testSpan).log(ts, "testevent");
+        }
     }
 
     @Test
     public void testOnFinish() throws InterruptedException {
-        APIExtensionsSpan span = new APIExtensionsSpan(Mockito.mock(Span.class), null,
+        Span testSpan = spanFactory.create();
+        APIExtensionsSpan span = new APIExtensionsSpan(testSpan, null,
                 0, 0, null);
         SpanObserver observer = Mockito.mock(SpanObserver.class);
         span.addSpanObserver(observer);
 
         span.finish();
 
-        verify(observer).onFinish(Mockito.eq(span), longCaptor.capture());
+        verify(observer).onFinish(Matchers.eq(span), longCaptor.capture());
         assertNotEquals(0, longCaptor.getValue().longValue());
+        if (testSpan != null) {
+            verify(testSpan).finish();
+        }
     }
 
     @Test
     public void testOnFinishWithTimestamp() throws InterruptedException {
-        APIExtensionsSpan span = new APIExtensionsSpan(Mockito.mock(Span.class), null,
+        Span testSpan = spanFactory.create();
+        APIExtensionsSpan span = new APIExtensionsSpan(testSpan, null,
                 0, 0, null);
         SpanObserver observer = Mockito.mock(SpanObserver.class);
         span.addSpanObserver(observer);
@@ -226,6 +287,12 @@ public class APIExtensionsSpanTest {
         span.finish(ts);
 
         verify(observer).onFinish(span, ts);
+        if (testSpan != null) {
+            verify(testSpan).finish(ts);
+        }
     }
 
+    public interface SpanFactory {
+        public Span create();
+    }
 }
