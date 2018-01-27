@@ -19,8 +19,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-import io.opentracing.ActiveSpan;
-import io.opentracing.BaseSpan;
+import io.opentracing.Scope;
 import io.opentracing.Span;
 import io.opentracing.SpanContext;
 import io.opentracing.Tracer;
@@ -55,7 +54,7 @@ public class APIExtensionsSpanBuilder implements SpanBuilder {
     }
 
     @Override
-    public SpanBuilder asChildOf(BaseSpan<?> parent) {
+    public SpanBuilder asChildOf(Span parent) {
         if (wrappedBuilder != null) {
             wrappedBuilder.asChildOf(parent);
         }
@@ -117,14 +116,15 @@ public class APIExtensionsSpanBuilder implements SpanBuilder {
     }
 
     @Override
-    public ActiveSpan startActive() {
-        return tracer.makeActive(startManual());
+    public Scope startActive(boolean finishSpanOnClose) {
+        return tracer.scopeManager().activate(start(), finishSpanOnClose);
     }
 
     @Override
+    @Deprecated
     public Span startManual() {
         APIExtensionsSpan span = new APIExtensionsSpan(
-                (wrappedBuilder == null ? null : wrappedBuilder.startManual()),
+                (wrappedBuilder == null ? null : wrappedBuilder.start()),
                 operationName, startTimestampMicro, startTimeNano, tags);
         for (TracerObserver observer : observers) {
             span.addSpanObserver(observer.onStart(span));

@@ -30,14 +30,13 @@ import io.opentracing.Tracer;
 import io.opentracing.contrib.api.SpanData;
 import io.opentracing.contrib.api.TracerObserver;
 import io.opentracing.mock.MockTracer;
-import io.opentracing.util.ThreadLocalActiveSpanSource;
 
 @SpringBootTest(
         classes = {TracerBeanPostProcessorTest.SpringConfiguration.class})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class TracerBeanPostProcessorTest {
 
-    private static final MockTracer mockTracer = new MockTracer(new ThreadLocalActiveSpanSource());
+    private static final MockTracer mockTracer = new MockTracer();
 
     private static final TracerObserver tracerObserver = Mockito.mock(TracerObserver.class);
 
@@ -67,7 +66,7 @@ public class TracerBeanPostProcessorTest {
     public void testTracerWrapped() {
         assertNotEquals(MockTracer.class, tracer.getClass());
 
-        tracer.buildSpan("testop").startManual();
+        tracer.buildSpan("testop").start();
 
         Mockito.verify(tracerObserver).onStart(Matchers.any(SpanData.class));
     }

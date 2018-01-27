@@ -18,8 +18,8 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import io.opentracing.ActiveSpan;
-import io.opentracing.NoopTracerFactory;
+import io.opentracing.noop.NoopTracerFactory;
+import io.opentracing.ScopeManager;
 import io.opentracing.Span;
 import io.opentracing.Tracer;
 
@@ -28,22 +28,21 @@ public class APIExtensionsTracerTest {
     @Test
     public void testActiveSpan() {
         Tracer tracer = Mockito.mock(Tracer.class);
-        ActiveSpan activeSpan = Mockito.mock(ActiveSpan.class);
-        Mockito.when(tracer.activeSpan()).thenReturn(activeSpan);
+        Span span = Mockito.mock(Span.class);
+        Mockito.when(tracer.activeSpan()).thenReturn(span);
         
         APIExtensionsTracer extTracer = new APIExtensionsTracer(tracer);
-        assertEquals(activeSpan, extTracer.activeSpan());
+        assertEquals(span, extTracer.activeSpan());
     }
 
     @Test
-    public void testMakeActive() {
+    public void testScopeManager() {
         Tracer tracer = Mockito.mock(Tracer.class);
-        ActiveSpan activeSpan = Mockito.mock(ActiveSpan.class);
-        Span span = Mockito.mock(Span.class);
-        Mockito.when(tracer.makeActive(span)).thenReturn(activeSpan);
+        ScopeManager scopeManager = Mockito.mock(ScopeManager.class);
+        Mockito.when(tracer.scopeManager()).thenReturn(scopeManager);
         
         APIExtensionsTracer extTracer = new APIExtensionsTracer(tracer);
-        assertEquals(activeSpan, extTracer.makeActive(span));
+        assertEquals(scopeManager, extTracer.scopeManager());
     }
 
     @Test
