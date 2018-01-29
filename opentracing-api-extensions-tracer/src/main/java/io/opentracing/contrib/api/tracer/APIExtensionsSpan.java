@@ -20,7 +20,7 @@ import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
-import io.opentracing.NoopSpanContext;
+import io.opentracing.noop.NoopSpanContext;
 import io.opentracing.Span;
 import io.opentracing.SpanContext;
 import io.opentracing.contrib.api.SpanData;
@@ -284,25 +284,7 @@ public class APIExtensionsSpan implements Span, SpanData  {
         return TimeUnit.NANOSECONDS.toMicros(finishTimeNano - startTimeNano);
     }
 
-    @SuppressWarnings("deprecation")
-    @Override
-    public Span log(String eventName, Object payload) {
-        if (wrappedSpan != null) {
-            wrappedSpan.log(eventName, payload);
-        }
-        return this;
-    }
-
-    @SuppressWarnings("deprecation")
-    @Override
-    public Span log(long timestampMicroseconds, String eventName, Object payload) {
-        if (wrappedSpan != null) {
-            wrappedSpan.log(timestampMicroseconds, eventName, payload);
-        }
-        return this;
-    }
-
-   static class SpanContextImpl implements NoopSpanContext {
+    static class SpanContextImpl implements NoopSpanContext {
         static final SpanContextImpl INSTANCE = new SpanContextImpl();
 
         @Override

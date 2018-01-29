@@ -15,29 +15,28 @@ package io.opentracing.contrib.api.tracer;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import io.opentracing.ActiveSpan;
-import io.opentracing.ActiveSpanSource;
-import io.opentracing.NoopTracer;
+import io.opentracing.noop.NoopTracer;
+import io.opentracing.ScopeManager;
 import io.opentracing.Span;
 import io.opentracing.SpanContext;
 import io.opentracing.Tracer;
 import io.opentracing.contrib.api.APIExtensionsManager;
 import io.opentracing.contrib.api.TracerObserver;
 import io.opentracing.propagation.Format;
-import io.opentracing.util.ThreadLocalActiveSpanSource;
+import io.opentracing.util.ThreadLocalScopeManager;
 
 public class APIExtensionsTracer implements Tracer, APIExtensionsManager {
 
     private final Tracer wrappedTracer;
     private final List<TracerObserver> observers = new CopyOnWriteArrayList<TracerObserver>();
-    private final ActiveSpanSource activeSpanSource;
+    private final ScopeManager scopeManager;
 
     public APIExtensionsTracer(Tracer tracer) {
         if (tracer instanceof NoopTracer) {
-            this.activeSpanSource = new ThreadLocalActiveSpanSource();
+            this.scopeManager = new ThreadLocalScopeManager();
             this.wrappedTracer = null;
         } else {
-            this.activeSpanSource = null;
+            this.scopeManager = null;
             this.wrappedTracer = tracer;
         }
     }
@@ -57,19 +56,11 @@ public class APIExtensionsTracer implements Tracer, APIExtensionsManager {
     }
 
     @Override
-    public ActiveSpan activeSpan() {
+    public Span activeSpan() {
         if (wrappedTracer != null) {
             return wrappedTracer.activeSpan();
         }
-        return activeSpanSource.activeSpan();
-    }
-
-    @Override
-    public ActiveSpan makeActive(Span span) {
-        if (wrappedTracer != null) {
-            return wrappedTracer.makeActive(span);
-        }
-        return activeSpanSource.makeActive(span);
+        return scopeManager.active() == null ? null : scopeManager.active().span();
     }
 
     @Override
@@ -91,6 +82,11 @@ public class APIExtensionsTracer implements Tracer, APIExtensionsManager {
         if (wrappedTracer != null) {
             wrappedTracer.inject(context, format, carrier);
         }
+    }
+
+    @Override
+    public ScopeManager scopeManager() {
+        return wrappedTracer == null ? scopeManager : wrappedTracer.scopeManager();
     }
 
 }

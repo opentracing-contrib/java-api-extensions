@@ -17,24 +17,23 @@ import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 
-import io.opentracing.NoopTracerFactory;
+import io.opentracing.noop.NoopTracerFactory;
 import io.opentracing.contrib.api.SpanData;
 import io.opentracing.contrib.api.SpanObserver;
 import io.opentracing.contrib.api.TracerObserver;
 import io.opentracing.mock.MockTracer;
-import io.opentracing.util.ThreadLocalActiveSpanSource;
 
 public class APIExtensionsFullSpanLifecycleTest {
 
     @Test
     public void testMockTracerActiveSpan() {
-        APIExtensionsTracer extTracer = new APIExtensionsTracer(new MockTracer(new ThreadLocalActiveSpanSource()));
+        APIExtensionsTracer extTracer = new APIExtensionsTracer(new MockTracer());
         TracerObserver tracerObserver = Mockito.mock(TracerObserver.class);
         SpanObserver spanObserver = Mockito.mock(SpanObserver.class);
         Mockito.when(tracerObserver.onStart(Matchers.any(SpanData.class))).thenReturn(spanObserver);
         extTracer.addTracerObserver(tracerObserver);
 
-        extTracer.buildSpan("testOp").startActive().deactivate();
+        extTracer.buildSpan("testOp").startActive(true).close();
         
         Mockito.verify(spanObserver, Mockito.times(1)).onFinish(Matchers.any(SpanData.class), Matchers.anyLong());
     }
@@ -47,7 +46,7 @@ public class APIExtensionsFullSpanLifecycleTest {
         Mockito.when(tracerObserver.onStart(Matchers.any(SpanData.class))).thenReturn(spanObserver);
         extTracer.addTracerObserver(tracerObserver);
 
-        extTracer.buildSpan("testOp").startManual().finish();
+        extTracer.buildSpan("testOp").start().finish();
         
         Mockito.verify(spanObserver, Mockito.times(1)).onFinish(Matchers.any(SpanData.class), Matchers.anyLong());
     }
@@ -60,7 +59,7 @@ public class APIExtensionsFullSpanLifecycleTest {
         Mockito.when(tracerObserver.onStart(Matchers.any(SpanData.class))).thenReturn(spanObserver);
         extTracer.addTracerObserver(tracerObserver);
 
-        extTracer.buildSpan("testOp").startActive().deactivate();
+        extTracer.buildSpan("testOp").startActive(true).close();
         
         Mockito.verify(spanObserver, Mockito.times(1)).onFinish(Matchers.any(SpanData.class), Matchers.anyLong());
     }
@@ -73,7 +72,7 @@ public class APIExtensionsFullSpanLifecycleTest {
         Mockito.when(tracerObserver.onStart(Matchers.any(SpanData.class))).thenReturn(spanObserver);
         extTracer.addTracerObserver(tracerObserver);
 
-        extTracer.buildSpan("testOp").startManual().finish();
+        extTracer.buildSpan("testOp").start().finish();
         
         Mockito.verify(spanObserver, Mockito.times(1)).onFinish(Matchers.any(SpanData.class), Matchers.anyLong());
     }

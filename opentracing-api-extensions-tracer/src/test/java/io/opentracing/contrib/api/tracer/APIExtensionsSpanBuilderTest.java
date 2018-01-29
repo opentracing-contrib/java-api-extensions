@@ -30,8 +30,9 @@ import org.mockito.Captor;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import io.opentracing.ActiveSpan;
 import io.opentracing.References;
+import io.opentracing.Scope;
+import io.opentracing.ScopeManager;
 import io.opentracing.Span;
 import io.opentracing.SpanContext;
 import io.opentracing.Tracer;
@@ -160,17 +161,17 @@ public class APIExtensionsSpanBuilderTest {
     }
 
     @Test
-    public void testStartManual() {
+    public void testStart() {
         TestResources res = new TestResources();
 
-        Span manualSpan = res.extSpanBuilder.startManual();
+        Span manualSpan = res.extSpanBuilder.start();
         assertTrue(manualSpan instanceof APIExtensionsSpan);
         
         APIExtensionsSpan extSpan = (APIExtensionsSpan)manualSpan;
 
         Mockito.verify(res.observer).onStart(extSpan);
         if (res.spanBuilder != null) {
-            Mockito.verify(res.spanBuilder).startManual();
+            Mockito.verify(res.spanBuilder).start();
         }
         assertEquals("op", extSpan.getOperationName());
     }
@@ -179,11 +180,12 @@ public class APIExtensionsSpanBuilderTest {
     public void testStartActive() {
         TestResources res = new TestResources();
 
-        Mockito.when(res.tracer.makeActive(spanCaptor.capture())).thenReturn(res.activeSpan);
+        Mockito.when(res.tracer.scopeManager()).thenReturn(res.scopeManager);
+        Mockito.when(res.scopeManager.activate(spanCaptor.capture(), Mockito.anyBoolean())).thenReturn(res.scope);
 
-        ActiveSpan extActiveSpan = res.extSpanBuilder.startActive();
+        Scope extScope = res.extSpanBuilder.startActive(true);
 
-        assertEquals(res.activeSpan, extActiveSpan);
+        assertEquals(res.scope, extScope);
         assertTrue(spanCaptor.getValue() instanceof APIExtensionsSpan);
     }
 
@@ -194,7 +196,8 @@ public class APIExtensionsSpanBuilderTest {
         public APIExtensionsSpanBuilder extSpanBuilder;
         public SpanContext spanContext;
         public Span span;
-        public ActiveSpan activeSpan;
+        public Scope scope;
+        public ScopeManager scopeManager;
         
         public TestResources() {
             tracer = Mockito.mock(Tracer.class);
@@ -204,7 +207,8 @@ public class APIExtensionsSpanBuilderTest {
                     "op", spanBuilder);
             spanContext = Mockito.mock(SpanContext.class);
             span = Mockito.mock(Span.class);
-            activeSpan = Mockito.mock(ActiveSpan.class);
+            scope = Mockito.mock(Scope.class);
+            scopeManager = Mockito.mock(ScopeManager.class);
         }
     }
 
