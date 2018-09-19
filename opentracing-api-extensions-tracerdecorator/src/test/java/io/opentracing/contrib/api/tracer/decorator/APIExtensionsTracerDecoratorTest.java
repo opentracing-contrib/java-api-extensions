@@ -18,8 +18,8 @@ import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 
-import io.opentracing.NoopTracerFactory;
 import io.opentracing.Tracer;
+import io.opentracing.noop.NoopTracerFactory;
 import io.opentracing.contrib.api.SpanData;
 import io.opentracing.contrib.api.TracerObserver;
 import io.opentracing.contrib.api.tracer.APIExtensionsTracer;
