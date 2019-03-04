@@ -25,6 +25,7 @@ import io.opentracing.Span;
 import io.opentracing.SpanContext;
 import io.opentracing.contrib.api.SpanData;
 import io.opentracing.contrib.api.SpanObserver;
+import io.opentracing.tag.Tag;
 
 public class APIExtensionsSpan implements Span, SpanData  {
 
@@ -92,6 +93,16 @@ public class APIExtensionsSpan implements Span, SpanData  {
     @Override
     public Object getCorrelationId() {
         return correlationId;
+    }
+
+    @Override
+    public String getTraceId() {
+        return context().toTraceId();
+    }
+
+    @Override
+    public String getSpanId() {
+        return context().toSpanId();
     }
 
     @Override
@@ -210,6 +221,14 @@ public class APIExtensionsSpan implements Span, SpanData  {
         return handleSetTag(key, value);
     }
 
+    @Override
+    public <T> Span setTag(Tag<T> tag, T value) {
+        if (wrappedSpan != null) {
+            wrappedSpan.setTag(tag, value);
+        }
+        return handleSetTag(tag.getKey(), value);
+    }
+
     private Span handleSetTag(String key, Object value) {
         tags.put(key, value);
         for (SpanObserver observer : observers) {
@@ -286,6 +305,16 @@ public class APIExtensionsSpan implements Span, SpanData  {
 
     static class SpanContextImpl implements NoopSpanContext {
         static final SpanContextImpl INSTANCE = new SpanContextImpl();
+
+        @Override
+        public String toTraceId() {
+            return "";
+        }
+
+        @Override
+        public String toSpanId() {
+            return "";
+        }
 
         @Override
         public Iterable<Map.Entry<String, String>> baggageItems() {

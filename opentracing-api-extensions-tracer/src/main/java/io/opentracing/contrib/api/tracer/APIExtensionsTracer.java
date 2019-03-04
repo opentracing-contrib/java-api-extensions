@@ -13,17 +13,19 @@
  */
 package io.opentracing.contrib.api.tracer;
 
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import io.opentracing.noop.NoopTracer;
+import io.opentracing.Scope;
 import io.opentracing.ScopeManager;
 import io.opentracing.Span;
 import io.opentracing.SpanContext;
 import io.opentracing.Tracer;
 import io.opentracing.contrib.api.APIExtensionsManager;
 import io.opentracing.contrib.api.TracerObserver;
+import io.opentracing.noop.NoopTracer;
 import io.opentracing.propagation.Format;
 import io.opentracing.util.ThreadLocalScopeManager;
+
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class APIExtensionsTracer implements Tracer, APIExtensionsManager {
 
@@ -61,6 +63,11 @@ public class APIExtensionsTracer implements Tracer, APIExtensionsManager {
             return wrappedTracer.activeSpan();
         }
         return scopeManager.active() == null ? null : scopeManager.active().span();
+    }
+
+    @Override
+    public Scope activateSpan(Span span) {
+        return scopeManager().activate(span);
     }
 
     @Override

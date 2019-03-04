@@ -13,18 +13,19 @@
  */
 package io.opentracing.contrib.api.tracer;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
-
 import io.opentracing.Scope;
 import io.opentracing.Span;
 import io.opentracing.SpanContext;
 import io.opentracing.Tracer;
 import io.opentracing.Tracer.SpanBuilder;
 import io.opentracing.contrib.api.TracerObserver;
+import io.opentracing.tag.Tag;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 public class APIExtensionsSpanBuilder implements SpanBuilder {
 
@@ -100,6 +101,15 @@ public class APIExtensionsSpanBuilder implements SpanBuilder {
         tags.put(key, value);
         if (wrappedBuilder != null) {
             wrappedBuilder.withTag(key, value);
+        }
+        return this;
+    }
+
+    @Override
+    public <T> SpanBuilder withTag(Tag<T> tag, T value) {
+        tags.put(tag.getKey(), value);
+        if (wrappedBuilder != null) {
+            wrappedBuilder.withTag(tag, value);
         }
         return this;
     }

@@ -33,6 +33,10 @@ public interface SpanData {
      */
     Object getCorrelationId();
 
+    String getTraceId();
+
+    String getSpanId();
+
     /**
      * The start time of the {@link io.opentracing.Span}.
      *
