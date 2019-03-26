@@ -85,6 +85,13 @@ public class APIExtensionsTracer implements Tracer, APIExtensionsManager {
     }
 
     @Override
+    public void close() {
+        if (wrappedTracer != null) {
+            wrappedTracer.close();
+        }
+    }
+
+    @Override
     public <C> void inject(SpanContext context, Format<C> format, C carrier) {
         if (wrappedTracer != null) {
             wrappedTracer.inject(context, format, carrier);
