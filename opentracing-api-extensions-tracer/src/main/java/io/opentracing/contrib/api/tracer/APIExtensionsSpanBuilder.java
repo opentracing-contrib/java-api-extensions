@@ -13,7 +13,6 @@
  */
 package io.opentracing.contrib.api.tracer;
 
-import io.opentracing.Scope;
 import io.opentracing.Span;
 import io.opentracing.SpanContext;
 import io.opentracing.Tracer;
@@ -126,13 +125,7 @@ public class APIExtensionsSpanBuilder implements SpanBuilder {
     }
 
     @Override
-    public Scope startActive(boolean finishSpanOnClose) {
-        return tracer.scopeManager().activate(start(), finishSpanOnClose);
-    }
-
-    @Override
-    @Deprecated
-    public Span startManual() {
+    public Span start() {
         APIExtensionsSpan span = new APIExtensionsSpan(
                 (wrappedBuilder == null ? null : wrappedBuilder.start()),
                 operationName, startTimestampMicro, startTimeNano, tags);
@@ -140,11 +133,6 @@ public class APIExtensionsSpanBuilder implements SpanBuilder {
             span.addSpanObserver(observer.onStart(span));
         }
         return span;
-    }
-
-    @Override
-    public Span start() {
-        return startManual();
     }
 
     public Map<String, Object> tags() {

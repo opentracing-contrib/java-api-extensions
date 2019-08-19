@@ -176,19 +176,6 @@ public class APIExtensionsSpanBuilderTest {
         assertEquals("op", extSpan.getOperationName());
     }
 
-    @Test
-    public void testStartActive() {
-        TestResources res = new TestResources();
-
-        Mockito.when(res.tracer.scopeManager()).thenReturn(res.scopeManager);
-        Mockito.when(res.scopeManager.activate(spanCaptor.capture(), Mockito.anyBoolean())).thenReturn(res.scope);
-
-        Scope extScope = res.extSpanBuilder.startActive(true);
-
-        assertEquals(res.scope, extScope);
-        assertTrue(spanCaptor.getValue() instanceof APIExtensionsSpan);
-    }
-
     public class TestResources {
         public Tracer tracer;
         public SpanBuilder spanBuilder;
