@@ -59,10 +59,7 @@ public class APIExtensionsTracer implements Tracer, APIExtensionsManager {
 
     @Override
     public Span activeSpan() {
-        if (wrappedTracer != null) {
-            return wrappedTracer.activeSpan();
-        }
-        return scopeManager.active() == null ? null : scopeManager.active().span();
+        return wrappedTracer != null ? wrappedTracer.activeSpan() : scopeManager.activeSpan();
     }
 
     @Override

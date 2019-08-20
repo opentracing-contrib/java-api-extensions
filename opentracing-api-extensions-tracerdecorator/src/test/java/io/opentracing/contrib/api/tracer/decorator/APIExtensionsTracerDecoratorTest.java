@@ -44,7 +44,7 @@ public class APIExtensionsTracerDecoratorTest {
         Tracer tracer = TracerResolver.resolveTracer();
         assertEquals(APIExtensionsTracer.class, tracer.getClass());
 
-        tracer.buildSpan("testop").startManual();
+        tracer.buildSpan("testop").start();
 
         Mockito.verify(observer).onStart(Matchers.any(SpanData.class));
     }
