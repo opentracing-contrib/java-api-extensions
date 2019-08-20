@@ -26,7 +26,7 @@ import io.opentracing.mock.MockTracer;
 public class APIExtensionsFullSpanLifecycleTest {
 
     @Test
-    public void testMockTracerManualSpan() {
+    public void testMockTracerSpan() {
         APIExtensionsTracer extTracer = new APIExtensionsTracer(new MockTracer());
         TracerObserver tracerObserver = Mockito.mock(TracerObserver.class);
         SpanObserver spanObserver = Mockito.mock(SpanObserver.class);
@@ -39,7 +39,7 @@ public class APIExtensionsFullSpanLifecycleTest {
     }
 
     @Test
-    public void testNoopTracerManualSpan() {
+    public void testNoopTracerSpan() {
         APIExtensionsTracer extTracer = new APIExtensionsTracer(NoopTracerFactory.create());
         TracerObserver tracerObserver = Mockito.mock(TracerObserver.class);
         SpanObserver spanObserver = Mockito.mock(SpanObserver.class);
