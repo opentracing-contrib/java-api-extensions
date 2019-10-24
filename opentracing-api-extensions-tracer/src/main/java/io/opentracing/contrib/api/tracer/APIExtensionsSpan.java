@@ -230,9 +230,11 @@ public class APIExtensionsSpan implements Span, SpanData  {
     }
 
     private Span handleSetTag(String key, Object value) {
-        tags.put(key, value);
-        for (SpanObserver observer : observers) {
-            observer.onSetTag(this, key, value);
+        if (key != null && value != null) {
+            tags.put(key, value);
+            for (SpanObserver observer : observers) {
+                observer.onSetTag(this, key, value);
+            }
         }
         return this;
     }

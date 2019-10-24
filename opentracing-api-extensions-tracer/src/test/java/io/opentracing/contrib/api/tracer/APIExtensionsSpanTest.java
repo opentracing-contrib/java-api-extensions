@@ -14,12 +14,14 @@
 package io.opentracing.contrib.api.tracer;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
@@ -204,6 +206,22 @@ public class APIExtensionsSpanTest {
         verify(observer).onSetTag(span, "testkey", Boolean.TRUE);
         if (testSpan != null) {
             verify(testSpan).setTag("testkey", Boolean.TRUE);
+        }
+    }
+
+    @Test
+    public void testOnSetTagNull() throws InterruptedException {
+        Span testSpan = spanFactory.create();
+        APIExtensionsSpan span = new APIExtensionsSpan(testSpan, null,
+                0, 0, new ConcurrentHashMap<String, Object>());
+        SpanObserver observer = Mockito.mock(SpanObserver.class);
+        span.addSpanObserver(observer);
+
+        span.setTag((String)null, (String)null);
+
+        verify(observer, never()).onSetTag(span, null, null);
+        if (testSpan != null) {
+            verify(testSpan).setTag((String)null, (String)null);
         }
     }
 
