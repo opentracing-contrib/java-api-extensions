@@ -14,7 +14,6 @@
 package io.opentracing.contrib.api.tracer;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import java.util.Arrays;
@@ -210,18 +209,34 @@ public class APIExtensionsSpanTest {
     }
 
     @Test
-    public void testOnSetTagNull() throws InterruptedException {
+    public void testOnSetTagNullKey() throws InterruptedException {
         Span testSpan = spanFactory.create();
         APIExtensionsSpan span = new APIExtensionsSpan(testSpan, null,
                 0, 0, new ConcurrentHashMap<String, Object>());
         SpanObserver observer = Mockito.mock(SpanObserver.class);
         span.addSpanObserver(observer);
 
-        span.setTag((String)null, (String)null);
+        span.setTag((String)null, "testvalue");
 
-        verify(observer, never()).onSetTag(span, null, null);
+        verify(observer).onSetTag(span, null, "testvalue");
         if (testSpan != null) {
-            verify(testSpan).setTag((String)null, (String)null);
+            verify(testSpan).setTag((String)null, "testvalue");
+        }
+    }
+
+    @Test
+    public void testOnSetTagNullValue() throws InterruptedException {
+        Span testSpan = spanFactory.create();
+        APIExtensionsSpan span = new APIExtensionsSpan(testSpan, null,
+                0, 0, new ConcurrentHashMap<String, Object>());
+        SpanObserver observer = Mockito.mock(SpanObserver.class);
+        span.addSpanObserver(observer);
+
+        span.setTag("testkey", (String)null);
+
+        verify(observer).onSetTag(span, "testkey", null);
+        if (testSpan != null) {
+            verify(testSpan).setTag("testkey", (String)null);
         }
     }
 
