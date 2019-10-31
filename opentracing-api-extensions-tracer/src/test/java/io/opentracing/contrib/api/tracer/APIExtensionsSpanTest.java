@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
@@ -204,6 +205,38 @@ public class APIExtensionsSpanTest {
         verify(observer).onSetTag(span, "testkey", Boolean.TRUE);
         if (testSpan != null) {
             verify(testSpan).setTag("testkey", Boolean.TRUE);
+        }
+    }
+
+    @Test
+    public void testOnSetTagNullKey() throws InterruptedException {
+        Span testSpan = spanFactory.create();
+        APIExtensionsSpan span = new APIExtensionsSpan(testSpan, null,
+                0, 0, new ConcurrentHashMap<String, Object>());
+        SpanObserver observer = Mockito.mock(SpanObserver.class);
+        span.addSpanObserver(observer);
+
+        span.setTag((String)null, "testvalue");
+
+        verify(observer).onSetTag(span, null, "testvalue");
+        if (testSpan != null) {
+            verify(testSpan).setTag((String)null, "testvalue");
+        }
+    }
+
+    @Test
+    public void testOnSetTagNullValue() throws InterruptedException {
+        Span testSpan = spanFactory.create();
+        APIExtensionsSpan span = new APIExtensionsSpan(testSpan, null,
+                0, 0, new ConcurrentHashMap<String, Object>());
+        SpanObserver observer = Mockito.mock(SpanObserver.class);
+        span.addSpanObserver(observer);
+
+        span.setTag("testkey", (String)null);
+
+        verify(observer).onSetTag(span, "testkey", null);
+        if (testSpan != null) {
+            verify(testSpan).setTag("testkey", (String)null);
         }
     }
 
